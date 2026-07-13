@@ -1,3 +1,4 @@
+import { Globe, Linkedin, Mail, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const stats = [
@@ -91,6 +92,13 @@ const faqs = [
     "How long does delivery take?",
     "Standard orders usually ship within 3 to 5 business days, with faster options available for urgent orders.",
   ],
+];
+
+const previewRows = [
+  { label: "Email", value: "alex@apexcorp.com", icon: Mail },
+  { label: "Website", value: "apexcorp.com", icon: Globe },
+  { label: "Phone", value: "+1 (555) 000-1234", icon: Phone },
+  { label: "LinkedIn", value: "linkedin.com/in/alex-morgan", icon: Linkedin },
 ];
 
 export function HomePage() {
@@ -242,36 +250,75 @@ export function HomePage() {
           <div className="flex justify-center">
             <div className="relative">
               <div className="absolute inset-0 rounded-[999px] bg-cyan-300/10 blur-[60px]" />
-              <div className="relative h-[500px] w-[255px] overflow-hidden rounded-[38px] border border-white/12 bg-[#090912] p-3 shadow-[0_30px_90px_rgba(0,0,0,0.7)]">
-                <div className="mx-auto h-7 w-28 rounded-b-[18px] border border-white/8 border-t-0 bg-[#090912]" />
-                <div className="relative mt-4 flex h-full flex-col overflow-hidden rounded-[28px] border border-white/6 bg-[radial-gradient(circle_at_top,rgba(81,97,255,0.07),transparent_36%),linear-gradient(180deg,#0e0d16_0%,#090913_100%)] px-4 pb-5 pt-6">
-                  <div className="absolute inset-x-8 top-5 h-14 rounded-full bg-cyan-300/8 blur-2xl" />
-                  <div className="mx-auto flex h-[82px] w-[82px] items-center justify-center rounded-full border border-white/18 bg-[linear-gradient(135deg,#8fe9ff_0%,#9588ff_100%)] font-['Space_Grotesk',sans-serif] text-[2rem] font-extrabold text-[#0b0b12] shadow-[0_0_42px_rgba(103,232,249,0.22)]">
-                    JZ
-                  </div>
-                  <div className="mt-4 text-center font-['Space_Grotesk',sans-serif] text-lg font-bold text-white">
-                    Juzer Zulfikar Ali
-                  </div>
-                  <div className="mt-1 text-center text-xs text-white/45">
-                    Technical Director / Ezzy Group
-                  </div>
-                  <div className="mt-5 space-y-3">
-                    {[
-                      "linkedin.com/in/juzer-zulfikar-ali",
-                      "juzer@ezzy.group",
-                      "+880 1755 503943",
-                      "ezzygroup.net",
-                    ].map((item) => (
-                      <div
-                        key={item}
-                        className="rounded-[18px] border border-white/8 bg-white/[0.055] px-4 py-3.5 text-left text-sm font-medium text-white/88 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
-                      >
-                        {item}
+              <div className="relative h-[560px] w-[292px] overflow-hidden rounded-[42px] border border-white/12 bg-[#090912] p-3 shadow-[0_30px_90px_rgba(0,0,0,0.7)]">
+                <div className="mx-auto h-7 w-30 rounded-b-[18px] border border-white/8 border-t-0 bg-[#090912]" />
+                <div className="relative mt-4 h-[500px] overflow-hidden rounded-[30px] border border-white/6 bg-[radial-gradient(circle_at_top,rgba(81,97,255,0.08),transparent_32%),linear-gradient(180deg,#10121e_0%,#090913_100%)] px-3 py-3">
+                  <div className="absolute inset-x-10 top-6 h-16 rounded-full bg-cyan-300/8 blur-3xl" />
+                  <div className="relative rounded-[26px] border border-white/10 bg-white/[0.045] p-4 shadow-[0_22px_60px_rgba(0,0,0,0.32)] backdrop-blur-xl">
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-[58px] w-[58px] shrink-0 items-center justify-center rounded-[18px] border border-white/12 bg-[linear-gradient(135deg,#8fe9ff_0%,#9588ff_100%)] text-[1.45rem] font-bold text-[#0b0b12] shadow-[0_0_36px_rgba(103,232,249,0.18)]">
+                        AM
                       </div>
-                    ))}
-                  </div>
-                  <div className="mt-auto rounded-[18px] bg-[linear-gradient(135deg,#67e8f9_0%,#3bcbff_100%)] px-4 py-3.5 text-center text-sm font-bold text-slate-950 shadow-[0_0_28px_rgba(103,232,249,0.22)]">
-                    Save to Contacts
+                      <div className="min-w-0 flex-1 pt-1">
+                        <div className="text-[18px] font-semibold leading-[1.06] tracking-[-0.02em] text-white">
+                          Alex Morgan
+                        </div>
+                        <div className="mt-1 text-[11px] leading-snug text-white/68">
+                          <div className="truncate">Head of Product</div>
+                          <div className="truncate">Apex Corp</div>
+                        </div>
+                      </div>
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border border-white/20 bg-white p-2 text-[10px] font-bold text-slate-800">
+                        AC
+                      </div>
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-2 gap-2">
+                      <div className="rounded-xl bg-blue-600 px-3 py-2.5 text-center text-[11px] font-semibold text-white shadow-[0_10px_24px_rgba(37,99,235,0.24)]">
+                        Save Contact
+                      </div>
+                      <div className="rounded-xl border border-white/12 bg-white/8 px-3 py-2.5 text-center text-[11px] font-semibold text-white/92">
+                        Share
+                      </div>
+                    </div>
+
+                    <div className="mt-4 space-y-2.5">
+                      {previewRows.map((row) => {
+                        const Icon = row.icon;
+
+                        return (
+                          <div
+                            key={row.label}
+                            className="flex items-center justify-between gap-2 rounded-[16px] border border-white/10 bg-white/[0.055] px-3 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+                          >
+                            <div className="flex min-w-0 items-center gap-2.5">
+                              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] border border-white/10 bg-white/6 text-white/82">
+                                <Icon size={14} />
+                              </div>
+                              <div className="min-w-0">
+                                <div className="text-[9px] tracking-[0.14em] text-white/48">
+                                  {row.label.toUpperCase()}
+                                </div>
+                                <div className="truncate text-[11px] font-semibold text-white/92">
+                                  {row.value}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[10px] border border-white/10 bg-white/6 text-[11px] text-white/65">
+                              ↗
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-between border-t border-white/8 pt-3 text-[10px] text-white/42">
+                      <div className="flex items-center gap-1.5">
+                        <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                        Tap NFC to open
+                      </div>
+                      <span>Copy Link</span>
+                    </div>
                   </div>
                 </div>
               </div>
