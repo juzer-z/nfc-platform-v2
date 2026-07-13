@@ -321,6 +321,12 @@ export function AdminProfileForm({
             payloadPreview.is_active && payloadPreview.is_published ? "public" : "hidden"
           }`}
         />
+        {mode === "edit" && !onDelete ? (
+          <SidebarCard
+            title="Role permissions"
+            body="Your account can create and edit profiles, but deleting profiles is restricted to higher-level admin roles."
+          />
+        ) : null}
       </div>
     </div>
   );

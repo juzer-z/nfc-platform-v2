@@ -8,6 +8,7 @@ type AdminAccessState = {
   loading: boolean;
   session: ReturnType<typeof useAdminSession>["session"];
   canAccess: boolean;
+  canDeleteProfiles: boolean;
   role: Role | null;
 };
 
@@ -54,6 +55,10 @@ export function useAdminAccess(): AdminAccessState {
   const canAccess =
     Boolean(session?.user) &&
     Boolean(roleRow?.is_active) &&
+    (role === "SUPER_ADMIN" || role === "HR_ADMIN" || role === "EMPLOYEE");
+  const canDeleteProfiles =
+    Boolean(session?.user) &&
+    Boolean(roleRow?.is_active) &&
     (role === "SUPER_ADMIN" || role === "HR_ADMIN");
 
   return {
@@ -61,6 +66,7 @@ export function useAdminAccess(): AdminAccessState {
     loading: configured ? sessionLoading || loading : false,
     session,
     canAccess,
+    canDeleteProfiles,
     role,
   };
 }

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AdminProfileForm } from "@/components/admin-profile-form";
+import { useAdminAccess } from "@/hooks/use-admin-access";
 import { StatusCard } from "@/components/status-card";
-import { useAdminSession } from "@/hooks/use-admin-session";
 import {
   createEmptyProfileForm,
   mapProfileToForm,
@@ -22,7 +22,12 @@ export function AdminProfileEditorPage({
 }) {
   const navigate = useNavigate();
   const { id = "" } = useParams();
-  const { configured, loading: sessionLoading, session } = useAdminSession();
+  const {
+    configured,
+    loading: accessLoading,
+    session,
+    canDeleteProfiles,
+  } = useAdminAccess();
   const [form, setForm] = useState<ProfileFormValues>(createEmptyProfileForm());
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(mode === "edit");
@@ -30,11 +35,11 @@ export function AdminProfileEditorPage({
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    if (sessionLoading) return;
+    if (accessLoading) return;
     if (configured && !session) {
       navigate("/admin/login");
     }
-  }, [configured, navigate, session, sessionLoading]);
+  }, [accessLoading, configured, navigate, session]);
 
   useEffect(() => {
     if (mode !== "edit" || !configured || !session || !id) {
@@ -145,7 +150,7 @@ export function AdminProfileEditorPage({
       </div>
 
       <div className="mt-8">
-        {loading || sessionLoading ? (
+        {loading || accessLoading ? (
           <StatusCard
             title="Loading profile"
             body="Fetching the latest profile state from Supabase..."
@@ -159,7 +164,7 @@ export function AdminProfileEditorPage({
             message={message}
             onChange={update}
             onSubmit={handleSubmit}
-            onDelete={mode === "edit" ? handleDelete : undefined}
+            onDelete={mode === "edit" && canDeleteProfiles ? handleDelete : undefined}
           />
         )}
       </div>

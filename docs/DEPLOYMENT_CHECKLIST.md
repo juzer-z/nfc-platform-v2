@@ -115,6 +115,20 @@ as $$
   );
 $$;
 
+create or replace function public.can_manage_profiles()
+returns boolean
+language sql
+stable
+as $$
+  select exists (
+    select 1
+    from public.user_roles
+    where user_id = auth.uid()
+      and is_active = true
+      and role in ('SUPER_ADMIN', 'HR_ADMIN', 'EMPLOYEE')
+  );
+$$;
+
 drop policy if exists "public can read active published profiles" on public.profiles;
 create policy "public can read active published profiles"
 on public.profiles
@@ -122,11 +136,30 @@ for select
 using (is_active = true and is_published = true);
 
 drop policy if exists "admins can manage profiles" on public.profiles;
-create policy "admins can manage profiles"
+create policy "users can read draft profiles they manage"
 on public.profiles
-for all
+for select
+using (public.can_manage_profiles());
+
+drop policy if exists "users can insert profiles" on public.profiles;
+create policy "users can insert profiles"
+on public.profiles
+for insert
+with check (public.can_manage_profiles());
+
+drop policy if exists "users can update profiles" on public.profiles;
+create policy "users can update profiles"
+on public.profiles
+for update
+using (public.can_manage_profiles())
+with check (public.can_manage_profiles());
+
+drop policy if exists "admins can delete profiles" on public.profiles;
+create policy "admins can delete profiles"
+on public.profiles
+for delete
 using (public.is_active_admin())
-with check (public.is_active_admin());
+;
 
 drop policy if exists "admins can read roles" on public.user_roles;
 create policy "admins can read roles"
@@ -168,6 +201,18 @@ insert into public.user_roles (user_id, role, is_active)
 select id, 'SUPER_ADMIN', true
 from auth.users
 where email = 'your-admin@email.com'
+on conflict (user_id) do update
+set role = excluded.role,
+    is_active = excluded.is_active;
+```
+
+For a limited user who can create and edit profiles but cannot delete them, assign:
+
+```sql
+insert into public.user_roles (user_id, role, is_active)
+select id, 'EMPLOYEE', true
+from auth.users
+where email = 'profile-editor@email.com'
 on conflict (user_id) do update
 set role = excluded.role,
     is_active = excluded.is_active;

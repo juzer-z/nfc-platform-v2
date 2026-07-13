@@ -69,7 +69,8 @@ create table if not exists public.user_roles (
 ## Basic RLS Idea
 
 - Public users can `select` only active + published profiles
-- Authenticated admins can `select/insert/update/delete` profiles
+- `SUPER_ADMIN` and `HR_ADMIN` can create/edit/delete profiles
+- `EMPLOYEE` can create/edit profiles but cannot delete them
 - Only admins can read profile views
 
 Example public read policy:
@@ -85,7 +86,72 @@ using (is_active = true and is_published = true);
 
 If you want the Cloudflare vCard function to read via Supabase REST, public `select` on active + published profiles is required.
 
-Admin policies should be added after the `user_roles` logic is finalized.
+Recommended role helper functions:
+
+```sql
+create or replace function public.is_active_admin()
+returns boolean
+language sql
+stable
+as $$
+  select exists (
+    select 1
+    from public.user_roles
+    where user_id = auth.uid()
+      and is_active = true
+      and role in ('SUPER_ADMIN', 'HR_ADMIN')
+  );
+$$;
+
+create or replace function public.can_manage_profiles()
+returns boolean
+language sql
+stable
+as $$
+  select exists (
+    select 1
+    from public.user_roles
+    where user_id = auth.uid()
+      and is_active = true
+      and role in ('SUPER_ADMIN', 'HR_ADMIN', 'EMPLOYEE')
+  );
+$$;
+```
+
+Then split the profile policies so delete remains admin-only:
+
+```sql
+drop policy if exists "public can read active published profiles" on public.profiles;
+create policy "public can read active published profiles"
+on public.profiles
+for select
+using (is_active = true and is_published = true);
+
+drop policy if exists "users can read draft profiles they manage" on public.profiles;
+create policy "users can read draft profiles they manage"
+on public.profiles
+for select
+using (public.can_manage_profiles());
+
+drop policy if exists "users can insert profiles" on public.profiles;
+create policy "users can insert profiles"
+on public.profiles
+for insert
+with check (public.can_manage_profiles());
+
+drop policy if exists "users can update profiles" on public.profiles;
+create policy "users can update profiles"
+on public.profiles
+for update
+using (public.can_manage_profiles())
+with check (public.can_manage_profiles());
+
+drop policy if exists "admins can delete profiles" on public.profiles;
+create policy "admins can delete profiles"
+on public.profiles
+for delete
+using (public.is_active_admin());
+```
 
 ## Notes
 
