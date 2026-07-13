@@ -9,7 +9,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@imagekit/javascript": "^4.1.0",
     "@imagekit/react": "^5.0.0",
     "@supabase/supabase-js": "^2.54.0",
     "lucide-react": "^0.563.0",
