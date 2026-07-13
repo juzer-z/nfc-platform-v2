@@ -144,12 +144,7 @@ export function HomePage() {
         className="relative z-10 overflow-hidden px-4 pb-20 pt-20 sm:px-6 sm:pt-28"
       >
         <div className="mx-auto flex max-w-7xl flex-col items-center text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-cyan-300 sm:text-xs">
-            <span className="h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_12px_rgba(103,232,249,0.85)]" />
-            NFC-Powered Business Cards
-          </div>
-
-          <h1 className="mt-8 max-w-5xl font-['Space_Grotesk',sans-serif] text-5xl font-extrabold leading-[0.95] tracking-[-0.06em] text-white sm:text-7xl lg:text-[6.7rem]">
+          <h1 className="max-w-5xl font-['Space_Grotesk',sans-serif] text-5xl font-extrabold leading-[0.95] tracking-[-0.06em] text-white sm:text-7xl lg:text-[6.7rem]">
             <span className="landing-gradient-text">One Tap.</span>
             <br />
             <span className="landing-gradient-text">Infinite</span>
@@ -165,7 +160,7 @@ export function HomePage() {
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <a
               href="#pricing"
-              className="rounded-2xl bg-cyan-300 px-6 py-3.5 text-base font-bold text-black transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_0_36px_rgba(103,232,249,0.35)]"
+              className="rounded-2xl bg-[linear-gradient(135deg,#67e8f9_0%,#3bcbff_100%)] px-6 py-3.5 text-base font-bold text-slate-950 shadow-[0_18px_38px_rgba(59,203,255,0.28)] transition hover:-translate-y-0.5 hover:bg-[linear-gradient(135deg,#8cf4ff_0%,#56d6ff_100%)] hover:shadow-[0_0_36px_rgba(103,232,249,0.35)]"
             >
               Order Your Card
             </a>
@@ -249,27 +244,33 @@ export function HomePage() {
               <div className="absolute inset-0 rounded-[999px] bg-cyan-300/10 blur-[60px]" />
               <div className="relative h-[500px] w-[255px] overflow-hidden rounded-[38px] border border-white/12 bg-[#090912] p-3 shadow-[0_30px_90px_rgba(0,0,0,0.7)]">
                 <div className="mx-auto h-7 w-28 rounded-b-[18px] border border-white/8 border-t-0 bg-[#090912]" />
-                <div className="mt-4 flex h-full flex-col rounded-[28px] bg-[linear-gradient(180deg,#0d0d1a_0%,#060610_100%)] px-4 pb-5 pt-6">
-                  <div className="mx-auto flex h-[74px] w-[74px] items-center justify-center rounded-full bg-[linear-gradient(135deg,#67e8f9_0%,#8b5cf6_100%)] font-['Space_Grotesk',sans-serif] text-2xl font-extrabold text-black shadow-[0_0_35px_rgba(103,232,249,0.3)]">
-                    AM
+                <div className="relative mt-4 flex h-full flex-col overflow-hidden rounded-[28px] border border-white/6 bg-[radial-gradient(circle_at_top,rgba(81,97,255,0.07),transparent_36%),linear-gradient(180deg,#0e0d16_0%,#090913_100%)] px-4 pb-5 pt-6">
+                  <div className="absolute inset-x-8 top-5 h-14 rounded-full bg-cyan-300/8 blur-2xl" />
+                  <div className="mx-auto flex h-[82px] w-[82px] items-center justify-center rounded-full border border-white/18 bg-[linear-gradient(135deg,#8fe9ff_0%,#9588ff_100%)] font-['Space_Grotesk',sans-serif] text-[2rem] font-extrabold text-[#0b0b12] shadow-[0_0_42px_rgba(103,232,249,0.22)]">
+                    JZ
                   </div>
                   <div className="mt-4 text-center font-['Space_Grotesk',sans-serif] text-lg font-bold text-white">
-                    Alex Morgan
+                    Juzer Zulfikar Ali
                   </div>
                   <div className="mt-1 text-center text-xs text-white/45">
-                    Head of Product / Apex Corp
+                    Technical Director / Ezzy Group
                   </div>
                   <div className="mt-5 space-y-3">
-                    {["LinkedIn profile", "alex@apexcorp.com", "+1 (555) 000-1234", "apexcorp.com"].map((item) => (
+                    {[
+                      "linkedin.com/in/juzer-zulfikar-ali",
+                      "juzer@ezzy.group",
+                      "+880 1755 503943",
+                      "ezzygroup.net",
+                    ].map((item) => (
                       <div
                         key={item}
-                        className="rounded-xl border border-white/8 bg-white/5 px-4 py-3 text-sm text-white/85"
+                        className="rounded-[18px] border border-white/8 bg-white/[0.055] px-4 py-3.5 text-left text-sm font-medium text-white/88 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
                       >
                         {item}
                       </div>
                     ))}
                   </div>
-                  <div className="mt-auto rounded-xl bg-cyan-300 px-4 py-3 text-center text-sm font-bold text-black shadow-[0_0_28px_rgba(103,232,249,0.28)]">
+                  <div className="mt-auto rounded-[18px] bg-[linear-gradient(135deg,#67e8f9_0%,#3bcbff_100%)] px-4 py-3.5 text-center text-sm font-bold text-slate-950 shadow-[0_0_28px_rgba(103,232,249,0.22)]">
                     Save to Contacts
                   </div>
                 </div>
