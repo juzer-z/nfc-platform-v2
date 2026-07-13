@@ -77,7 +77,7 @@ export function PublicProfileCard({ profile }: { profile: PublicProfile }) {
         </div>
 
         <div className="min-w-0 flex-1 pt-1 sm:pt-2">
-          <div className="truncate text-[24px] font-semibold leading-[1.05] tracking-[-0.02em] text-white sm:text-[28px]">
+          <div className="text-[24px] font-semibold leading-[1.08] tracking-[-0.02em] text-white [overflow-wrap:anywhere] sm:text-[28px]">
             {profile.fullName}
           </div>
           <div className="mt-2 text-[13px] leading-snug text-white/70 sm:text-[14px]">
