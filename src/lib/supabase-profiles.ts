@@ -2,10 +2,21 @@ import { buildProfilePayload, type ProfileFormValues } from "./profile-form";
 import { supabase } from "./supabase";
 import type { ProfileRecord } from "./types";
 
-export async function listProfiles(query: string) {
+export async function listProfiles({
+  query,
+  page,
+  pageSize,
+}: {
+  query: string;
+  page: number;
+  pageSize: number;
+}) {
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
   let request = supabase
     .from("profiles")
-    .select("*")
+    .select("*", { count: "exact" })
     .order("created_at", { ascending: false });
 
   const trimmed = query.trim();
@@ -27,7 +38,7 @@ export async function listProfiles(query: string) {
     );
   }
 
-  return request;
+  return request.range(from, to);
 }
 
 export async function getProfileById(id: string) {

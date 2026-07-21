@@ -6,6 +6,12 @@ import { hasSupabaseConfig } from "@/lib/env";
 import { mapProfile, type PublicProfile } from "@/lib/profile-mappers";
 import { supabase } from "@/lib/supabase";
 
+const PROFILE_CACHE_TTL_MS = 1000 * 60 * 5;
+
+function getProfileCacheKey(slug: string) {
+  return `public-profile-cache:${slug}`;
+}
+
 const demoProfile: PublicProfile = {
   id: "demo",
   slug: "demo-profile",
@@ -28,8 +34,25 @@ const demoProfile: PublicProfile = {
 
 export function PublicProfilePage() {
   const { slug = "" } = useParams();
-  const [profile, setProfile] = useState<PublicProfile | null>(null);
-  const [state, setState] = useState<"loading" | "ready" | "missing" | "error">("loading");
+  const [profile, setProfile] = useState<PublicProfile | null>(() => {
+    if (typeof window === "undefined" || !slug) return null;
+
+    try {
+      const raw = window.sessionStorage.getItem(getProfileCacheKey(slug));
+      if (!raw) return null;
+      const cached = JSON.parse(raw) as { profile: PublicProfile; savedAt: number };
+      if (Date.now() - cached.savedAt > PROFILE_CACHE_TTL_MS) {
+        window.sessionStorage.removeItem(getProfileCacheKey(slug));
+        return null;
+      }
+      return cached.profile;
+    } catch {
+      return null;
+    }
+  });
+  const [state, setState] = useState<"loading" | "ready" | "missing" | "error">(
+    profile ? "ready" : "loading"
+  );
 
   const fallbackProfile = useMemo(
     () => (slug === demoProfile.slug || !slug ? demoProfile : null),
@@ -38,6 +61,10 @@ export function PublicProfilePage() {
 
   useEffect(() => {
     let ignore = false;
+
+    if (profile) {
+      setState("ready");
+    }
 
     async function loadProfile() {
       if (!slug) {
@@ -72,8 +99,23 @@ export function PublicProfilePage() {
         return;
       }
 
-      setProfile(mapProfile(data));
+      const mappedProfile = mapProfile(data);
+      setProfile(mappedProfile);
       setState("ready");
+
+      if (typeof window !== "undefined") {
+        try {
+          window.sessionStorage.setItem(
+            getProfileCacheKey(slug),
+            JSON.stringify({
+              profile: mappedProfile,
+              savedAt: Date.now(),
+            })
+          );
+        } catch {
+          // Ignore sessionStorage errors.
+        }
+      }
     }
 
     void loadProfile();
@@ -118,10 +160,9 @@ export function PublicProfilePage() {
             body="Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to start loading real profiles."
           />
         ) : (
-          <StatusCard
-            title="Loading profile"
-            body="Fetching the public business card preview from Supabase..."
-          />
+          <div className="flex h-24 w-24 items-center justify-center rounded-full border border-white/10 bg-white/6 shadow-[0_25px_80px_rgba(0,0,0,0.35)] backdrop-blur-xl">
+            <div className="h-10 w-10 animate-spin rounded-full border-2 border-white/20 border-t-cyan-300" />
+          </div>
         )}
       </div>
     </div>

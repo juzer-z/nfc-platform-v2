@@ -312,10 +312,6 @@ export function AdminProfileForm({
 
       <div className="space-y-4">
         <SidebarCard
-          title="ImageKit note"
-          body="Signed ImageKit upload is wired through /api/imagekit-auth as a Cloudflare Pages Function. Add IMAGEKIT_PRIVATE_KEY in Pages env to make the upload buttons live."
-        />
-        <SidebarCard
           title="Saved payload"
           body={`slug: ${payloadPreview.slug}\nstatus: ${
             payloadPreview.is_active && payloadPreview.is_published ? "public" : "hidden"

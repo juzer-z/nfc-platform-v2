@@ -55,9 +55,6 @@ export function AdminLoginPage() {
           <h1 className="mt-4 text-3xl font-semibold tracking-[-0.03em] text-white">
             Sign in
           </h1>
-          <p className="mt-3 text-sm leading-6 text-white/60">
-            This version uses Supabase Auth instead of custom JWT cookies.
-          </p>
         </div>
 
         {error ? (

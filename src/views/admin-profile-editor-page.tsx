@@ -15,6 +15,12 @@ import {
   updateProfile,
 } from "@/lib/supabase-profiles";
 
+function getDraftKey(mode: "create" | "edit", id: string) {
+  return mode === "create"
+    ? "admin-profile-draft:create"
+    : `admin-profile-draft:edit:${id}`;
+}
+
 export function AdminProfileEditorPage({
   mode,
 }: {
@@ -28,7 +34,18 @@ export function AdminProfileEditorPage({
     session,
     canDeleteProfiles,
   } = useAdminAccess();
-  const [form, setForm] = useState<ProfileFormValues>(createEmptyProfileForm());
+  const [form, setForm] = useState<ProfileFormValues>(() => {
+    if (typeof window === "undefined" || mode !== "create") {
+      return createEmptyProfileForm();
+    }
+
+    try {
+      const saved = window.sessionStorage.getItem(getDraftKey("create", ""));
+      return saved ? (JSON.parse(saved) as ProfileFormValues) : createEmptyProfileForm();
+    } catch {
+      return createEmptyProfileForm();
+    }
+  });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(mode === "edit");
   const [saving, setSaving] = useState(false);
@@ -55,7 +72,22 @@ export function AdminProfileEditorPage({
       if (error) {
         setMessage(error.message);
       } else if (data) {
-        setForm(mapProfileToForm(data));
+        const fetchedForm = mapProfileToForm(data);
+
+        if (typeof window !== "undefined") {
+          try {
+            const saved = window.sessionStorage.getItem(getDraftKey("edit", id));
+            if (saved) {
+              setForm(JSON.parse(saved) as ProfileFormValues);
+            } else {
+              setForm(fetchedForm);
+            }
+          } catch {
+            setForm(fetchedForm);
+          }
+        } else {
+          setForm(fetchedForm);
+        }
       } else {
         setMessage("Profile not found.");
       }
@@ -74,6 +106,17 @@ export function AdminProfileEditorPage({
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (mode === "edit" && !id) return;
+
+    try {
+      window.sessionStorage.setItem(getDraftKey(mode, id), JSON.stringify(form));
+    } catch {
+      // Ignore storage quota / privacy-mode errors.
+    }
+  }, [form, id, mode]);
+
   async function handleSubmit() {
     const fullName = form.fullName.trim();
     if (!fullName) {
@@ -91,6 +134,9 @@ export function AdminProfileEditorPage({
           return;
         }
         if (data) {
+          if (typeof window !== "undefined") {
+            window.sessionStorage.removeItem(getDraftKey("create", ""));
+          }
           navigate(`/admin/profiles/${data.id}`);
         }
         return;
@@ -102,6 +148,9 @@ export function AdminProfileEditorPage({
         return;
       }
 
+      if (typeof window !== "undefined") {
+        window.sessionStorage.removeItem(getDraftKey("edit", id));
+      }
       setMessage("Saved successfully.");
     } finally {
       setSaving(false);
@@ -116,6 +165,9 @@ export function AdminProfileEditorPage({
       if (error) {
         setMessage(error.message);
         return;
+      }
+      if (typeof window !== "undefined") {
+        window.sessionStorage.removeItem(getDraftKey("edit", id));
       }
       navigate("/admin/profiles");
     } finally {
@@ -143,10 +195,6 @@ export function AdminProfileEditorPage({
         <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-white">
           {mode === "create" ? "Create profile" : "Edit profile"}
         </h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-white/65">
-          Supabase CRUD is wired here now. Media fields currently accept ImageKit URLs directly;
-          signed browser upload will be the next pass.
-        </p>
       </div>
 
       <div className="mt-8">

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { ReactNode } from "react";
 import {
   ArrowUpRight,
@@ -18,6 +19,7 @@ type Row = {
 };
 
 export function PublicProfileCard({ profile }: { profile: PublicProfile }) {
+  const [shareLabel, setShareLabel] = useState("Share");
   const rows: Row[] = [
     {
       label: "Email",
@@ -81,8 +83,8 @@ export function PublicProfileCard({ profile }: { profile: PublicProfile }) {
             {profile.fullName}
           </div>
           <div className="mt-2 text-[13px] leading-snug text-white/70 sm:text-[14px]">
-            {profile.title ? <div className="truncate">{profile.title}</div> : null}
-            {profile.company ? <div className="truncate">{profile.company}</div> : null}
+            {profile.title ? <div className="whitespace-normal break-words">{profile.title}</div> : null}
+            {profile.company ? <div className="whitespace-normal break-words">{profile.company}</div> : null}
           </div>
         </div>
 
@@ -109,9 +111,10 @@ export function PublicProfileCard({ profile }: { profile: PublicProfile }) {
         </a>
         <button
           type="button"
+          onClick={() => void handleShare(profile, setShareLabel)}
           className="rounded-xl border border-white/12 bg-white/10 px-4 py-3 text-center font-semibold text-white transition hover:bg-white/14"
         >
-          Share
+          {shareLabel}
         </button>
       </div>
 
@@ -132,7 +135,7 @@ export function PublicProfileCard({ profile }: { profile: PublicProfile }) {
                 <div className="text-[11px] tracking-wide text-white/60">
                   {row.label.toUpperCase()}
                 </div>
-                <div className="truncate text-[14px] font-semibold text-white/92">
+                <div className="whitespace-normal break-words text-[14px] font-semibold leading-snug text-white/92">
                   {row.value}
                 </div>
               </div>
@@ -155,4 +158,30 @@ function normalizeUrl(value: string) {
 
 function buildVCardLink(slug: string) {
   return `/api/vcard/${slug}`;
+}
+
+async function handleShare(
+  profile: PublicProfile,
+  setShareLabel: (label: string) => void
+) {
+  const shareUrl = typeof window !== "undefined" ? window.location.href : `/u/${profile.slug}`;
+  const shareData = {
+    title: profile.fullName,
+    text: `${profile.fullName}${profile.company ? ` · ${profile.company}` : ""}`,
+    url: shareUrl,
+  };
+
+  try {
+    if (navigator.share) {
+      await navigator.share(shareData);
+      return;
+    }
+
+    await navigator.clipboard.writeText(shareUrl);
+    setShareLabel("Copied");
+    window.setTimeout(() => setShareLabel("Share"), 1800);
+  } catch {
+    setShareLabel("Copy failed");
+    window.setTimeout(() => setShareLabel("Share"), 1800);
+  }
 }
