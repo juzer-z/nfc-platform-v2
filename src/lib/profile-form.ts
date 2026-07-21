@@ -70,26 +70,70 @@ export function slugify(input: string) {
     .replace(/-+/g, "-");
 }
 
+export function normalizeWebsite(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
+
+export function normalizePhoneLike(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+
+  const hasLeadingPlus = trimmed.startsWith("+");
+  const digits = trimmed.replace(/\D/g, "");
+  if (!digits) return "";
+
+  return `${hasLeadingPlus ? "+" : ""}${digits}`;
+}
+
+export function isValidEmail(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return true;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed);
+}
+
+export function isValidSlug(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return true;
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(trimmed.toLowerCase());
+}
+
+export function getNormalizedProfileForm(
+  form: ProfileFormValues
+): ProfileFormValues {
+  return {
+    ...form,
+    slug: form.slug.trim().toLowerCase(),
+    emailPublic: form.emailPublic.trim(),
+    website: normalizeWebsite(form.website),
+    phone: normalizePhoneLike(form.phone),
+    whatsapp: normalizePhoneLike(form.whatsapp),
+  };
+}
+
 export function buildProfilePayload(form: ProfileFormValues) {
-  const fullName = form.fullName.trim();
+  const normalizedForm = getNormalizedProfileForm(form);
+  const fullName = normalizedForm.fullName.trim();
 
   return {
     full_name: fullName,
-    slug: (form.slug.trim() || slugify(fullName) || "user").toLowerCase(),
-    title: emptyToNull(form.title),
-    company: emptyToNull(form.company),
-    department: emptyToNull(form.department),
-    phone: emptyToNull(form.phone),
-    whatsapp: emptyToNull(form.whatsapp),
-    email_public: emptyToNull(form.emailPublic),
-    website: emptyToNull(form.website),
-    linkedin: emptyToNull(form.linkedin),
-    address: emptyToNull(form.address),
-    map_url: emptyToNull(form.mapUrl),
-    photo_url: emptyToNull(form.photoUrl),
-    company_logo_url: emptyToNull(form.companyLogoUrl),
-    is_active: form.isActive,
-    is_published: form.isPublished,
+    slug: (normalizedForm.slug.trim() || slugify(fullName) || "user").toLowerCase(),
+    title: emptyToNull(normalizedForm.title),
+    company: emptyToNull(normalizedForm.company),
+    department: emptyToNull(normalizedForm.department),
+    phone: emptyToNull(normalizedForm.phone),
+    whatsapp: emptyToNull(normalizedForm.whatsapp),
+    email_public: emptyToNull(normalizedForm.emailPublic),
+    website: emptyToNull(normalizedForm.website),
+    linkedin: emptyToNull(normalizedForm.linkedin),
+    address: emptyToNull(normalizedForm.address),
+    map_url: emptyToNull(normalizedForm.mapUrl),
+    photo_url: emptyToNull(normalizedForm.photoUrl),
+    company_logo_url: emptyToNull(normalizedForm.companyLogoUrl),
+    is_active: normalizedForm.isActive,
+    is_published: normalizedForm.isPublished,
   };
 }
 

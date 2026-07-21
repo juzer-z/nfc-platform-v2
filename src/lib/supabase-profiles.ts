@@ -2,6 +2,11 @@ import { buildProfilePayload, type ProfileFormValues } from "./profile-form";
 import { supabase } from "./supabase";
 import type { ProfileRecord } from "./types";
 
+export type ProfileDuplicateCandidate = Pick<
+  ProfileRecord,
+  "id" | "slug" | "full_name" | "company" | "title"
+>;
+
 export async function listProfiles({
   query,
   page,
@@ -67,4 +72,70 @@ export async function updateProfile(id: string, form: ProfileFormValues) {
 
 export async function deleteProfile(id: string) {
   return supabase.from("profiles").delete().eq("id", id);
+}
+
+export async function checkSlugAvailability(
+  slug: string,
+  excludeId?: string
+) {
+  const normalizedSlug = slug.trim().toLowerCase();
+  if (!normalizedSlug) {
+    return { available: true, data: null, error: null };
+  }
+
+  let request = supabase
+    .from("profiles")
+    .select("id, slug, full_name, company, title")
+    .eq("slug", normalizedSlug)
+    .limit(1);
+
+  if (excludeId) {
+    request = request.neq("id", excludeId);
+  }
+
+  const { data, error } = await request.maybeSingle<ProfileDuplicateCandidate>();
+
+  return {
+    available: !data,
+    data,
+    error,
+  };
+}
+
+export async function findPotentialDuplicates({
+  slug,
+  fullName,
+  excludeId,
+}: {
+  slug: string;
+  fullName: string;
+  excludeId?: string;
+}) {
+  const normalizedSlug = slug.trim().toLowerCase();
+  const normalizedName = fullName.trim();
+
+  if (!normalizedSlug && !normalizedName) {
+    return { data: [] as ProfileDuplicateCandidate[], error: null };
+  }
+
+  const filters = [
+    normalizedSlug ? `slug.ilike.%${normalizedSlug}%` : "",
+    normalizedName ? `full_name.ilike.%${normalizedName}%` : "",
+  ].filter(Boolean);
+
+  let request = supabase
+    .from("profiles")
+    .select("id, slug, full_name, company, title")
+    .order("created_at", { ascending: false })
+    .limit(5);
+
+  if (excludeId) {
+    request = request.neq("id", excludeId);
+  }
+
+  if (filters.length > 0) {
+    request = request.or(filters.join(","));
+  }
+
+  return request;
 }

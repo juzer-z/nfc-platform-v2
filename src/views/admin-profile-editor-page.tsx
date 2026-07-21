@@ -5,6 +5,7 @@ import { useAdminAccess } from "@/hooks/use-admin-access";
 import { StatusCard } from "@/components/status-card";
 import {
   createEmptyProfileForm,
+  getNormalizedProfileForm,
   mapProfileToForm,
   type ProfileFormValues,
 } from "@/lib/profile-form";
@@ -151,8 +152,9 @@ export function AdminProfileEditorPage({
     return () => window.clearTimeout(timer);
   }, [form, hasDraftChanges, id, mode]);
 
-  async function handleSubmit() {
-    const fullName = form.fullName.trim();
+  async function handleSubmit(nextForm?: ProfileFormValues) {
+    const candidateForm = getNormalizedProfileForm(nextForm ?? form);
+    const fullName = candidateForm.fullName.trim();
     if (!fullName) {
       setMessage("Full Name is required.");
       return;
@@ -162,7 +164,7 @@ export function AdminProfileEditorPage({
     setMessage("");
     try {
       if (mode === "create") {
-        const { data, error } = await createProfile(form);
+        const { data, error } = await createProfile(candidateForm);
         if (error) {
           setMessage(error.message);
           return;
@@ -176,11 +178,13 @@ export function AdminProfileEditorPage({
         return;
       }
 
-      const { error } = await updateProfile(id, form);
+      const { error } = await updateProfile(id, candidateForm);
       if (error) {
         setMessage(error.message);
         return;
       }
+
+      setForm(candidateForm);
 
       if (typeof window !== "undefined") {
         window.sessionStorage.removeItem(getDraftKey("edit", id));
@@ -250,6 +254,7 @@ export function AdminProfileEditorPage({
             deleting={deleting}
             message={message}
             draftStatus={draftStatus}
+            profileId={mode === "edit" ? id : undefined}
             onChange={update}
             onSubmit={handleSubmit}
             onDelete={mode === "edit" && canDeleteProfiles ? handleDelete : undefined}
