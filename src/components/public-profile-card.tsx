@@ -76,13 +76,7 @@ export function PublicProfileCard({ profile }: { profile: PublicProfile }) {
               alt={profile.fullName}
               className="h-full w-full object-cover"
             />
-          ) : (
-            <div className="relative flex h-full w-full items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,#4fd7f8_0%,#27406b_38%,#0d1422_100%)] text-[24px] font-semibold tracking-[-0.04em] text-white/95 sm:text-[28px]">
-              <div className="absolute inset-[10px] rounded-[18px] border border-white/10" />
-              <div className="absolute -top-5 left-1/2 h-12 w-12 -translate-x-1/2 rounded-full bg-cyan-300/20 blur-xl" />
-              <span className="relative">{getInitials(profile.fullName)}</span>
-            </div>
-          )}
+          ) : null}
         </div>
 
         <div className="min-w-0 flex-1 pt-1 sm:pt-2">
@@ -107,11 +101,7 @@ export function PublicProfileCard({ profile }: { profile: PublicProfile }) {
                 alt="Company logo"
                 className="max-h-full max-w-full rounded object-contain"
               />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center rounded-[16px] bg-[linear-gradient(145deg,#f8fbff_0%,#dfe8f4_100%)] text-[10px] font-bold uppercase tracking-[0.18em] text-slate-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
-                {getCompanyMark(profile.company)}
-              </div>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
@@ -191,6 +181,10 @@ export function PublicProfileCard({ profile }: { profile: PublicProfile }) {
           {copyLabel}
         </button>
       </div>
+
+      <div className="mt-4 text-center text-xs text-white/32">
+        Powered by 1card.fyi
+      </div>
     </div>
   );
 }
@@ -202,29 +196,6 @@ function normalizeUrl(value: string) {
 
 function buildVCardLink(slug: string) {
   return `/api/vcard/${slug}`;
-}
-
-function getInitials(fullName: string) {
-  const initials = fullName
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join("");
-
-  return initials || "1C";
-}
-
-function getCompanyMark(company: string | null) {
-  if (!company) return "BR";
-  const initials = company
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join("");
-
-  return initials || "BR";
 }
 
 function getCleanDomain(value: string) {
