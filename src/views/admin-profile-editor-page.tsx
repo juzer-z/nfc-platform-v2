@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AdminProfileForm } from "@/components/admin-profile-form";
 import { useAdminAccess } from "@/hooks/use-admin-access";
@@ -50,6 +50,15 @@ export function AdminProfileEditorPage({
   const [loading, setLoading] = useState(mode === "edit");
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [draftStatus, setDraftStatus] = useState<{
+    state: "idle" | "saving" | "saved";
+    text: string;
+  }>({
+    state: "idle",
+    text: "",
+  });
+  const [hasDraftChanges, setHasDraftChanges] = useState(false);
+  const draftInitializedRef = useRef(false);
 
   useEffect(() => {
     if (accessLoading) return;
@@ -103,19 +112,44 @@ export function AdminProfileEditorPage({
     key: K,
     value: ProfileFormValues[K]
   ) {
+    setHasDraftChanges(true);
+    setDraftStatus({
+      state: "saving",
+      text: "Saving draft...",
+    });
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (mode === "edit" && !id) return;
-
-    try {
-      window.sessionStorage.setItem(getDraftKey(mode, id), JSON.stringify(form));
-    } catch {
-      // Ignore storage quota / privacy-mode errors.
+    if (!draftInitializedRef.current) {
+      draftInitializedRef.current = true;
+      return;
     }
-  }, [form, id, mode]);
+    if (!hasDraftChanges) return;
+
+    const timer = window.setTimeout(() => {
+      try {
+        window.sessionStorage.setItem(getDraftKey(mode, id), JSON.stringify(form));
+        setDraftStatus({
+          state: "saved",
+          text: `Draft saved ${new Date().toLocaleTimeString([], {
+            hour: "numeric",
+            minute: "2-digit",
+          })}`,
+        });
+        setHasDraftChanges(false);
+      } catch {
+        setDraftStatus({
+          state: "idle",
+          text: "",
+        });
+      }
+    }, 450);
+
+    return () => window.clearTimeout(timer);
+  }, [form, hasDraftChanges, id, mode]);
 
   async function handleSubmit() {
     const fullName = form.fullName.trim();
@@ -151,6 +185,11 @@ export function AdminProfileEditorPage({
       if (typeof window !== "undefined") {
         window.sessionStorage.removeItem(getDraftKey("edit", id));
       }
+      setDraftStatus({
+        state: "saved",
+        text: "All changes saved",
+      });
+      setHasDraftChanges(false);
       setMessage("Saved successfully.");
     } finally {
       setSaving(false);
@@ -210,6 +249,7 @@ export function AdminProfileEditorPage({
             saving={saving}
             deleting={deleting}
             message={message}
+            draftStatus={draftStatus}
             onChange={update}
             onSubmit={handleSubmit}
             onDelete={mode === "edit" && canDeleteProfiles ? handleDelete : undefined}

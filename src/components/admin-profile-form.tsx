@@ -10,6 +10,10 @@ type Props = {
   saving: boolean;
   deleting?: boolean;
   message?: string;
+  draftStatus?: {
+    state: "idle" | "saving" | "saved";
+    text: string;
+  };
   onChange: <K extends keyof ProfileFormValues>(
     key: K,
     value: ProfileFormValues[K]
@@ -24,6 +28,7 @@ export function AdminProfileForm({
   saving,
   deleting = false,
   message,
+  draftStatus,
   onChange,
   onSubmit,
   onDelete,
@@ -47,6 +52,20 @@ export function AdminProfileForm({
   return (
     <div className="grid gap-6 lg:grid-cols-[1.45fr_0.55fr]">
       <div className="rounded-[28px] border border-white/10 bg-white/7 p-6 shadow-[0_30px_90px_rgba(0,0,0,0.36)] backdrop-blur-2xl">
+        {draftStatus?.state !== "idle" ? (
+          <div className="mb-4 flex justify-end">
+            <div
+              className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                draftStatus.state === "saving"
+                  ? "border border-cyan-300/20 bg-cyan-300/10 text-cyan-200"
+                  : "border border-emerald-400/20 bg-emerald-400/10 text-emerald-200"
+              }`}
+            >
+              {draftStatus.text}
+            </div>
+          </div>
+        ) : null}
+
         {message || uploadMessage ? (
           <div className="mb-6 rounded-2xl border border-white/12 bg-white/8 px-4 py-3 text-sm text-white/85">
             {uploadMessage || message}

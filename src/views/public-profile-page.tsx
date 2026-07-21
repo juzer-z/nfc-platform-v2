@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { PublicProfileCard } from "@/components/public-profile-card";
+import { PublicProfileCardSkeleton } from "@/components/public-profile-card-skeleton";
 import { StatusCard } from "@/components/status-card";
 import { hasSupabaseConfig } from "@/lib/env";
 import { mapProfile, type PublicProfile } from "@/lib/profile-mappers";
@@ -160,9 +161,7 @@ export function PublicProfilePage() {
             body="Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to start loading real profiles."
           />
         ) : (
-          <div className="flex h-24 w-24 items-center justify-center rounded-full border border-white/10 bg-white/6 shadow-[0_25px_80px_rgba(0,0,0,0.35)] backdrop-blur-xl">
-            <div className="h-10 w-10 animate-spin rounded-full border-2 border-white/20 border-t-cyan-300" />
-          </div>
+          <PublicProfileCardSkeleton />
         )}
       </div>
     </div>
