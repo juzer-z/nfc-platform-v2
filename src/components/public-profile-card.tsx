@@ -69,15 +69,15 @@ export function PublicProfileCard({ profile }: { profile: PublicProfile }) {
   return (
     <div className="motion-scale-in w-full max-w-[470px] rounded-[30px] border border-white/10 bg-white/6 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
       <div className="flex items-start gap-3 sm:gap-4">
-        <div className="h-[82px] w-[82px] shrink-0 overflow-hidden rounded-[22px] border border-white/12 bg-white/8 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_12px_28px_rgba(0,0,0,0.28)] sm:h-[92px] sm:w-[92px]">
-          {profile.photoUrl ? (
+        {profile.photoUrl ? (
+          <div className="h-[82px] w-[82px] shrink-0 overflow-hidden rounded-[22px] border border-white/12 bg-white/8 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_12px_28px_rgba(0,0,0,0.28)] sm:h-[92px] sm:w-[92px]">
             <img
               src={profile.photoUrl}
               alt={profile.fullName}
               className="h-full w-full object-cover"
             />
-          ) : null}
-        </div>
+          </div>
+        ) : null}
 
         <div className="min-w-0 flex-1 pt-1 sm:pt-2">
           <div className="text-[24px] font-semibold leading-[1.08] tracking-[-0.02em] text-white [overflow-wrap:anywhere] sm:text-[28px]">
@@ -93,17 +93,17 @@ export function PublicProfileCard({ profile }: { profile: PublicProfile }) {
           </div>
         </div>
 
-        <div className="shrink-0 pt-1 sm:pt-2">
-          <div className="flex h-14 w-14 items-center justify-center rounded-[20px] border border-white/20 bg-white p-2 shadow-[0_10px_30px_rgba(0,0,0,0.18)] sm:h-16 sm:w-16">
-            {profile.companyLogoUrl ? (
+        {profile.companyLogoUrl ? (
+          <div className="shrink-0 pt-1 sm:pt-2">
+            <div className="flex h-14 w-14 items-center justify-center rounded-[20px] border border-white/20 bg-white p-2 shadow-[0_10px_30px_rgba(0,0,0,0.18)] sm:h-16 sm:w-16">
               <img
                 src={profile.companyLogoUrl}
                 alt="Company logo"
                 className="max-h-full max-w-full rounded object-contain"
               />
-            ) : null}
+            </div>
           </div>
-        </div>
+        ) : null}
       </div>
 
       <div className="mt-5 grid grid-cols-2 gap-3">
