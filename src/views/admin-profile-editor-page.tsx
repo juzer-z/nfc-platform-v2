@@ -16,6 +16,12 @@ import {
   updateProfile,
 } from "@/lib/supabase-profiles";
 
+type ProfileAuditMeta = {
+  createdAt: string | null;
+  updatedAt: string | null;
+  createdBy: string | null;
+};
+
 function getDraftKey(mode: "create" | "edit", id: string) {
   return mode === "create"
     ? "admin-profile-draft:create"
@@ -51,6 +57,11 @@ export function AdminProfileEditorPage({
   const [loading, setLoading] = useState(mode === "edit");
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [auditMeta, setAuditMeta] = useState<ProfileAuditMeta>({
+    createdAt: null,
+    updatedAt: null,
+    createdBy: null,
+  });
   const [draftStatus, setDraftStatus] = useState<{
     state: "idle" | "saving" | "saved";
     text: string;
@@ -82,7 +93,16 @@ export function AdminProfileEditorPage({
       if (error) {
         setMessage(error.message);
       } else if (data) {
+        const recordWithMeta = data as typeof data & {
+          created_by?: string | null;
+          user_id?: string | null;
+        };
         const fetchedForm = mapProfileToForm(data);
+        setAuditMeta({
+          createdAt: data.created_at ?? null,
+          updatedAt: data.updated_at ?? null,
+          createdBy: recordWithMeta.created_by ?? recordWithMeta.user_id ?? null,
+        });
 
         if (typeof window !== "undefined") {
           try {
@@ -170,6 +190,11 @@ export function AdminProfileEditorPage({
           return;
         }
         if (data) {
+          setAuditMeta({
+            createdAt: data.created_at ?? null,
+            updatedAt: data.updated_at ?? null,
+            createdBy: session?.user.email ?? null,
+          });
           if (typeof window !== "undefined") {
             window.sessionStorage.removeItem(getDraftKey("create", ""));
           }
@@ -185,6 +210,11 @@ export function AdminProfileEditorPage({
       }
 
       setForm(candidateForm);
+      setAuditMeta((prev) => ({
+        ...prev,
+        updatedAt: new Date().toISOString(),
+        createdBy: prev.createdBy ?? session?.user.email ?? null,
+      }));
 
       if (typeof window !== "undefined") {
         window.sessionStorage.removeItem(getDraftKey("edit", id));
@@ -255,6 +285,7 @@ export function AdminProfileEditorPage({
             message={message}
             draftStatus={draftStatus}
             profileId={mode === "edit" ? id : undefined}
+            auditMeta={auditMeta}
             onChange={update}
             onSubmit={handleSubmit}
             onDelete={mode === "edit" && canDeleteProfiles ? handleDelete : undefined}

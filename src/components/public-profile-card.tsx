@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import type { ReactNode } from "react";
 import {
   ArrowUpRight,
@@ -67,7 +67,7 @@ export function PublicProfileCard({ profile }: { profile: PublicProfile }) {
   ].filter((row) => row.value.trim());
 
   return (
-    <div className="w-full max-w-[470px] rounded-[30px] border border-white/10 bg-white/6 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
+    <div className="motion-scale-in w-full max-w-[470px] rounded-[30px] border border-white/10 bg-white/6 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
       <div className="flex items-start gap-3 sm:gap-4">
         <div className="h-[82px] w-[82px] shrink-0 overflow-hidden rounded-[22px] border border-white/12 bg-white/8 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_12px_28px_rgba(0,0,0,0.28)] sm:h-[92px] sm:w-[92px]">
           {profile.photoUrl ? (
@@ -120,14 +120,14 @@ export function PublicProfileCard({ profile }: { profile: PublicProfile }) {
         <a
           href={buildVCardLink(profile.slug)}
           download
-          className="rounded-xl bg-blue-600 px-4 py-3 text-center font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700"
+          className="brand-primary-btn rounded-xl px-4 py-3 text-center font-semibold transition"
         >
           Save Contact
         </a>
         <button
           type="button"
           onClick={() => void handleShare(profile, setShareLabel)}
-          className="rounded-xl border border-white/12 bg-white/10 px-4 py-3 text-center font-semibold text-white transition hover:bg-white/14"
+          className="brand-outline-btn rounded-xl px-4 py-3 text-center font-semibold text-white transition"
         >
           {shareLabel}
         </button>

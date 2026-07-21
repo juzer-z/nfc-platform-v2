@@ -21,6 +21,11 @@ import {
 type Props = {
   form: ProfileFormValues;
   profileId?: string;
+  auditMeta?: {
+    createdAt: string | null;
+    updatedAt: string | null;
+    createdBy: string | null;
+  };
   mode: "create" | "edit";
   saving: boolean;
   deleting?: boolean;
@@ -40,6 +45,7 @@ type Props = {
 export function AdminProfileForm({
   form,
   profileId,
+  auditMeta,
   mode,
   saving,
   deleting = false,
@@ -61,15 +67,21 @@ export function AdminProfileForm({
     state: "idle",
     text: "",
   });
-  const [duplicateMatches, setDuplicateMatches] = useState<ProfileDuplicateCandidate[]>([]);
+  const [duplicateMatches, setDuplicateMatches] = useState<
+    ProfileDuplicateCandidate[]
+  >([]);
   const [validationMessage, setValidationMessage] = useState("");
 
-  const suggestedSlug = useMemo(() => {
-    return form.slug.trim() || slugify(form.fullName) || "your-slug";
-  }, [form.fullName, form.slug]);
-
   const normalizedForm = useMemo(() => getNormalizedProfileForm(form), [form]);
+  const suggestedSlug = useMemo(() => {
+    return normalizedForm.slug.trim() || slugify(normalizedForm.fullName) || "your-slug";
+  }, [normalizedForm.fullName, normalizedForm.slug]);
   const normalizedSlug = normalizedForm.slug.trim() || slugify(normalizedForm.fullName);
+  const publicUrl = `/u/${suggestedSlug}`;
+  const inputClass =
+    "mt-2 w-full rounded-2xl border border-white/12 bg-slate-950/40 px-4 py-3 text-white outline-none transition placeholder:text-white/28 focus:border-cyan-300/45";
+  const payloadPreview = buildProfilePayload(form);
+
   const emailError = !isValidEmail(normalizedForm.emailPublic)
     ? "Enter a valid email address."
     : "";
@@ -86,12 +98,6 @@ export function AdminProfileForm({
     normalizedForm.whatsapp.trim().replace(/\D/g, "").length < 7
       ? "WhatsApp number looks too short."
       : "";
-
-  const publicUrl = `/u/${suggestedSlug}`;
-  const inputClass =
-    "mt-2 w-full rounded-2xl border border-white/12 bg-slate-950/40 px-4 py-3 text-white outline-none transition placeholder:text-white/35 focus:border-blue-400/60";
-
-  const payloadPreview = buildProfilePayload(form);
 
   useEffect(() => {
     if (slugError) {
@@ -117,7 +123,10 @@ export function AdminProfileForm({
     });
 
     const timer = window.setTimeout(async () => {
-      const { available, error } = await checkSlugAvailability(normalizedSlug, profileId);
+      const { available, error } = await checkSlugAvailability(
+        normalizedSlug,
+        profileId
+      );
       if (ignore) return;
 
       if (error) {
@@ -160,7 +169,9 @@ export function AdminProfileForm({
       if (ignore || error) return;
 
       const matches = (data ?? []).filter((candidate) => {
-        const sameSlug = normalizedSlug && candidate.slug.toLowerCase() === normalizedSlug.toLowerCase();
+        const sameSlug =
+          normalizedSlug &&
+          candidate.slug.toLowerCase() === normalizedSlug.toLowerCase();
         const sameName =
           trimmedName &&
           candidate.full_name.trim().toLowerCase() === trimmedName.toLowerCase();
@@ -218,7 +229,9 @@ export function AdminProfileForm({
     }
 
     if (candidateForm.slug.trim() && !isValidSlug(candidateForm.slug)) {
-      setValidationMessage("Slug can only contain lowercase letters, numbers, and hyphens.");
+      setValidationMessage(
+        "Slug can only contain lowercase letters, numbers, and hyphens."
+      );
       return;
     }
 
@@ -258,8 +271,8 @@ export function AdminProfileForm({
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1.45fr_0.55fr]">
-      <div className="rounded-[28px] border border-white/10 bg-white/7 p-6 pb-28 shadow-[0_30px_90px_rgba(0,0,0,0.36)] backdrop-blur-2xl md:pb-6">
+    <div className="grid gap-5 lg:grid-cols-[1.45fr_0.55fr]">
+      <div className="brand-panel rounded-[28px] p-5 pb-28 md:p-6 md:pb-6">
         {draftStatus?.state !== "idle" ? (
           <div className="mb-4 flex justify-end">
             <div
@@ -275,13 +288,13 @@ export function AdminProfileForm({
         ) : null}
 
         {message || uploadMessage || validationMessage ? (
-          <div className="mb-6 rounded-2xl border border-white/12 bg-white/8 px-4 py-3 text-sm text-white/85">
+          <div className="mb-5 rounded-2xl border border-white/12 bg-white/8 px-4 py-3 text-sm text-white/85">
             {validationMessage || uploadMessage || message}
           </div>
         ) : null}
 
         {duplicateMatches.length > 0 ? (
-          <div className="mb-6 rounded-2xl border border-amber-300/25 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
+          <div className="mb-5 rounded-2xl border border-amber-300/25 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
             <div className="font-semibold text-amber-50">
               Similar profiles already exist
             </div>
@@ -306,7 +319,7 @@ export function AdminProfileForm({
           </div>
         ) : null}
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-x-5 gap-y-5 md:grid-cols-2">
           <Field label="Full Name" hint="Required">
             <input
               className={inputClass}
@@ -518,7 +531,7 @@ export function AdminProfileForm({
           </Field>
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-6">
+        <div className="mt-6 flex flex-wrap gap-5">
           <Toggle
             label="Active"
             checked={form.isActive}
@@ -531,12 +544,12 @@ export function AdminProfileForm({
           />
         </div>
 
-        <div className="mt-8 flex flex-wrap gap-3">
+        <div className="mt-7 flex flex-wrap gap-3">
           <button
             type="button"
             disabled={saving || submitting || hasBlockingValidation}
             onClick={() => void submitForm()}
-            className="rounded-2xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
+            className="brand-primary-btn rounded-2xl px-6 py-3 font-semibold transition disabled:opacity-60"
           >
             {saving || submitting
               ? mode === "create"
@@ -551,14 +564,14 @@ export function AdminProfileForm({
             href={publicUrl}
             target="_blank"
             rel="noreferrer"
-            className="rounded-2xl bg-emerald-600 px-6 py-3 font-semibold text-white transition hover:bg-emerald-700"
+            className="rounded-2xl border border-cyan-300/16 bg-cyan-300/12 px-6 py-3 font-semibold text-cyan-100 transition hover:bg-cyan-300/18"
           >
             View Public Page
           </a>
 
           <Link
             to="/admin/profiles"
-            className="rounded-2xl border border-white/12 bg-white/8 px-6 py-3 font-semibold text-white"
+            className="rounded-2xl border border-white/12 bg-white/8 px-6 py-3 font-semibold text-white transition hover:bg-white/10"
           >
             Back
           </Link>
@@ -586,14 +599,21 @@ export function AdminProfileForm({
 
       <div className="space-y-4">
         <SidebarCard
-          title="Saved payload"
-          body={`slug: ${payloadPreview.slug}\nstatus: ${
-            payloadPreview.is_active && payloadPreview.is_published ? "public" : "hidden"
-          }`}
+          title="Publish State"
+          body={`Slug: ${payloadPreview.slug}\nStatus: ${getStatusLabel(
+            payloadPreview.is_active,
+            payloadPreview.is_published
+          )}`}
+        />
+        <SidebarCard
+          title="Audit Info"
+          body={`Created: ${formatAuditDate(auditMeta?.createdAt)}\nLast updated: ${formatAuditDate(
+            auditMeta?.updatedAt
+          )}\nCreated by: ${auditMeta?.createdBy || "Not tracked yet"}`}
         />
         {mode === "edit" && !onDelete ? (
           <SidebarCard
-            title="Role permissions"
+            title="Role Permissions"
             body="Your account can create and edit profiles, but deleting profiles is restricted to higher-level admin roles."
           />
         ) : null}
@@ -625,7 +645,7 @@ export function AdminProfileForm({
             type="button"
             disabled={saving || submitting || hasBlockingValidation}
             onClick={() => void submitForm()}
-            className="flex-[1.3] rounded-2xl bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
+            className="brand-primary-btn flex-[1.3] rounded-2xl px-4 py-3 font-semibold transition disabled:opacity-60"
           >
             {saving || submitting
               ? mode === "create"
@@ -652,8 +672,10 @@ function Field({
 }) {
   return (
     <div>
-      <div className="text-xs uppercase tracking-[0.18em] text-white/60">{label}</div>
-      {hint ? <div className="mt-1 text-xs text-white/35">{hint}</div> : null}
+      <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/63">
+        {label}
+      </div>
+      {hint ? <div className="mt-1 text-xs text-white/30">{hint}</div> : null}
       {children}
     </div>
   );
@@ -670,7 +692,7 @@ function Toggle({
 }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="text-sm text-white">{label}</span>
+      <span className="text-sm text-white/88">{label}</span>
       <button
         type="button"
         onClick={() => onChange(!checked)}
@@ -690,9 +712,11 @@ function Toggle({
 
 function SidebarCard({ title, body }: { title: string; body: string }) {
   return (
-    <div className="rounded-[24px] border border-white/10 bg-white/6 p-5 text-sm leading-6 text-white/70 shadow-[0_22px_70px_rgba(0,0,0,0.28)] backdrop-blur-xl">
-      <div className="font-semibold text-white">{title}</div>
-      <p className="mt-2 whitespace-pre-line">{body}</p>
+    <div className="brand-panel rounded-[24px] p-5 text-sm leading-6 text-white/68">
+      <div className="text-[13px] font-semibold tracking-[-0.01em] text-white">
+        {title}
+      </div>
+      <p className="mt-2 whitespace-pre-line text-white/62">{body}</p>
     </div>
   );
 }
@@ -709,7 +733,7 @@ function FieldNote({
       ? "text-emerald-200"
       : tone === "error"
         ? "text-rose-200"
-        : "text-white/45";
+        : "text-white/42";
 
   return <div className={`mt-2 text-xs ${toneClass}`}>{children}</div>;
 }
@@ -745,11 +769,33 @@ function UploadPicker({
         className={`inline-flex cursor-pointer items-center justify-center rounded-xl border border-white/15 px-4 py-3 text-sm font-semibold text-white transition ${
           uploading
             ? "bg-white/10 opacity-60"
-            : "bg-white/10 hover:border-blue-400/60 hover:bg-blue-500/20"
+            : "bg-white/10 hover:border-cyan-300/45 hover:bg-cyan-300/10"
         }`}
       >
         {uploading ? "Uploading..." : label}
       </label>
     </div>
   );
+}
+
+function formatAuditDate(value?: string | null) {
+  if (!value) return "Not available";
+
+  try {
+    return new Date(value).toLocaleString([], {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  } catch {
+    return value;
+  }
+}
+
+function getStatusLabel(isActive: boolean, isPublished: boolean) {
+  if (!isActive) return "Hidden";
+  if (!isPublished) return "Draft";
+  return "Active";
 }

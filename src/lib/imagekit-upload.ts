@@ -19,10 +19,11 @@ export async function uploadImageToImageKit(file: File, kind: UploadKind) {
     throw new Error("ImageKit env is missing. Add URL endpoint and public key first.");
   }
 
+  const preparedFile = await optimizeImageForUpload(file, kind);
   const auth = await getImageKitAuth();
   const formData = new FormData();
-  formData.append("file", file);
-  formData.append("fileName", file.name);
+  formData.append("file", preparedFile);
+  formData.append("fileName", preparedFile.name);
   formData.append("publicKey", imagekitConfig.publicKey);
   formData.append("token", auth.token);
   formData.append("expire", String(auth.expire));
@@ -46,6 +47,65 @@ export async function uploadImageToImageKit(file: File, kind: UploadKind) {
   }
 
   return data.url;
+}
+
+async function optimizeImageForUpload(file: File, kind: UploadKind) {
+  if (!file.type.startsWith("image/")) {
+    return file;
+  }
+
+  const image = await loadImage(file);
+  const maxSide = kind === "photo" ? 1600 : 1200;
+  const scale = Math.min(1, maxSide / Math.max(image.width, image.height));
+  const width = Math.max(1, Math.round(image.width * scale));
+  const height = Math.max(1, Math.round(image.height * scale));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext("2d");
+
+  if (!context) {
+    return file;
+  }
+
+  context.drawImage(image, 0, 0, width, height);
+
+  const outputType =
+    file.type === "image/png" || file.type === "image/webp"
+      ? "image/webp"
+      : "image/jpeg";
+  const quality = kind === "photo" ? 0.82 : 0.9;
+
+  const blob = await new Promise<Blob | null>((resolve) => {
+    canvas.toBlob((value) => resolve(value), outputType, quality);
+  });
+
+  if (!blob) {
+    return file;
+  }
+
+  const extension = outputType === "image/webp" ? "webp" : "jpg";
+  const sanitizedName = file.name.replace(/\.[a-z0-9]+$/i, "");
+
+  return new File([blob], `${sanitizedName}.${extension}`, {
+    type: outputType,
+    lastModified: Date.now(),
+  });
+}
+
+async function loadImage(file: File) {
+  const objectUrl = URL.createObjectURL(file);
+
+  try {
+    const image = new Image();
+    image.decoding = "async";
+    image.src = objectUrl;
+    await image.decode();
+    return image;
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
 }
 
 async function getImageKitAuth() {

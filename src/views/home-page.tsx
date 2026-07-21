@@ -10,7 +10,7 @@ const stats = [
 
 const steps = [
   {
-    title: "Customise Your Profile",
+    title: "Customize Your Profile",
     body: "Add your name, title, photo, links, and contact details. Update it once and every card reflects the change.",
   },
   {
@@ -98,7 +98,7 @@ const previewRows = [
   { label: "Email", value: "alex@apexcorp.com", icon: Mail },
   { label: "Website", value: "apexcorp.com", icon: Globe },
   { label: "Phone", value: "+1 (555) 000-1234", icon: Phone },
-  { label: "LinkedIn", value: "linkedin.com/in/alex-morgan", icon: Linkedin },
+  { label: "LinkedIn", value: "LinkedIn / alex-morgan", icon: Linkedin },
 ];
 
 export function HomePage() {
@@ -114,9 +114,7 @@ export function HomePage() {
             href="#hero"
             className="font-['Space_Grotesk',sans-serif] text-[1.35rem] font-bold tracking-[-0.03em] text-white"
           >
-            <span className="bg-[linear-gradient(135deg,#fff_0%,#88ecff_100%)] bg-clip-text text-transparent">
-              1card.fyi
-            </span>
+            <span className="brand-gradient-text">1card.fyi</span>
           </a>
 
           <div className="hidden items-center gap-7 text-sm font-medium text-white/60 md:flex">
@@ -129,17 +127,14 @@ export function HomePage() {
             <a href="#pricing" className="transition hover:text-white">
               Pricing
             </a>
-            <Link
-              to="/admin/login"
-              className="transition hover:text-white"
-            >
+            <Link to="/admin/login" className="transition hover:text-white">
               Admin
             </Link>
             <a
               href="https://wa.me/8801886105253?text=Hi%2C%20I%20am%20interested%20in%20the%201card"
               target="_blank"
               rel="noreferrer"
-              className="rounded-full bg-cyan-300 px-4 py-2 font-semibold text-black transition hover:bg-white"
+              className="brand-primary-btn rounded-full px-4 py-2 font-semibold transition"
             >
               Get Yours
             </a>
@@ -152,7 +147,7 @@ export function HomePage() {
         className="relative z-10 overflow-hidden px-4 pb-20 pt-20 sm:px-6 sm:pt-28"
       >
         <div className="mx-auto flex max-w-7xl flex-col items-center text-center">
-          <h1 className="max-w-5xl font-['Space_Grotesk',sans-serif] text-5xl font-extrabold leading-[0.95] tracking-[-0.06em] text-white sm:text-7xl lg:text-[6.7rem]">
+          <h1 className="motion-fade-up max-w-5xl font-['Space_Grotesk',sans-serif] text-5xl font-extrabold leading-[0.95] tracking-[-0.06em] text-white sm:text-7xl lg:text-[6.7rem]">
             <span className="landing-gradient-text">One Tap.</span>
             <br />
             <span className="landing-gradient-text">Infinite</span>
@@ -160,27 +155,27 @@ export function HomePage() {
             <span className="landing-gradient-text">Impressions.</span>
           </h1>
 
-          <p className="mt-6 max-w-2xl text-base leading-8 text-white/60 sm:text-xl">
+          <p className="motion-fade-up-delayed mt-6 max-w-2xl text-base leading-8 text-white/60 sm:text-xl">
             Share your <span className="font-medium text-white">complete professional profile</span>
             {" "}instantly. No app. No paper. No friction. Just tap and connect.
           </p>
 
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+          <div className="motion-fade-up-delayed mt-10 flex flex-wrap items-center justify-center gap-4">
             <a
               href="#pricing"
-              className="rounded-2xl bg-[linear-gradient(135deg,#67e8f9_0%,#3bcbff_100%)] px-6 py-3.5 text-base font-bold text-slate-950 shadow-[0_18px_38px_rgba(59,203,255,0.28)] transition hover:-translate-y-0.5 hover:bg-[linear-gradient(135deg,#8cf4ff_0%,#56d6ff_100%)] hover:shadow-[0_0_36px_rgba(103,232,249,0.35)]"
+              className="brand-primary-btn rounded-2xl px-6 py-3.5 text-base font-bold transition hover:-translate-y-0.5 hover:shadow-[0_0_36px_rgba(103,232,249,0.35)]"
             >
               Order Your Card
             </a>
             <a
               href="#how"
-              className="rounded-2xl border border-white/10 bg-white/4 px-6 py-3.5 text-base font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/8"
+              className="brand-outline-btn rounded-2xl px-6 py-3.5 text-base font-semibold text-white transition hover:-translate-y-0.5"
             >
               See How It Works
             </a>
           </div>
 
-          <div className="mt-16 perspective-[1200px]">
+          <div className="motion-scale-in mt-16 perspective-[1200px]">
             <div className="landing-hero-card relative h-[212px] w-[340px] overflow-hidden rounded-[22px] border border-white/12 bg-[linear-gradient(135deg,#17192e_0%,#13203f_45%,#0f3560_100%)] shadow-[0_40px_90px_rgba(0,0,0,0.65)]">
               <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.12)_0%,transparent_45%,rgba(103,232,249,0.06)_100%)]" />
               <div className="landing-sweep absolute inset-0" />
@@ -206,7 +201,7 @@ export function HomePage() {
         <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 text-center sm:grid-cols-4">
           {stats.map((stat) => (
             <div key={stat.label}>
-              <div className="font-['Space_Grotesk',sans-serif] text-3xl font-extrabold tracking-[-0.04em] text-transparent sm:text-4xl landing-gradient-text">
+              <div className="brand-gradient-text font-['Space_Grotesk',sans-serif] text-3xl font-extrabold tracking-[-0.04em] sm:text-4xl">
                 {stat.value}
               </div>
               <div className="mt-1 text-sm text-white/45">{stat.label}</div>
@@ -222,7 +217,7 @@ export function HomePage() {
             <h2 className="mt-4 font-['Space_Grotesk',sans-serif] text-4xl font-extrabold leading-tight tracking-[-0.04em] text-white sm:text-5xl">
               From tap to contact
               <br />
-              <span className="text-cyan-300">in under 2 seconds</span>
+              <span className="brand-gradient-text">in under 2 seconds</span>
             </h2>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-white/55">
               No apps to download. No QR codes to scan. Just a simple tap and your full profile lands on their phone.
@@ -231,7 +226,7 @@ export function HomePage() {
             <div className="mt-10 space-y-7">
               {steps.map((step, index) => (
                 <div key={step.title} className="flex gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-cyan-300/25 bg-cyan-300/10 font-['Space_Grotesk',sans-serif] text-sm font-bold text-cyan-300">
+                  <div className="brand-pill flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl font-['Space_Grotesk',sans-serif] text-sm font-bold">
                     {String(index + 1).padStart(2, "0")}
                   </div>
                   <div>
@@ -274,7 +269,7 @@ export function HomePage() {
                     </div>
 
                     <div className="mt-4 grid grid-cols-2 gap-2">
-                      <div className="rounded-xl bg-blue-600 px-3 py-2.5 text-center text-[11px] font-semibold text-white shadow-[0_10px_24px_rgba(37,99,235,0.24)]">
+                      <div className="brand-primary-btn rounded-xl px-3 py-2.5 text-center text-[11px] font-semibold shadow-[0_10px_24px_rgba(37,99,235,0.24)]">
                         Save Contact
                       </div>
                       <div className="rounded-xl border border-white/12 bg-white/8 px-3 py-2.5 text-center text-[11px] font-semibold text-white/92">
@@ -343,7 +338,7 @@ export function HomePage() {
         <div className="mt-14 grid gap-px overflow-hidden rounded-[28px] border border-white/8 bg-white/8 md:grid-cols-2 xl:grid-cols-3">
           {features.map(([title, body], index) => (
             <div key={title} className="bg-[#0d0d14] p-8 transition hover:bg-[#12121c]">
-              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/6 text-lg font-bold text-cyan-300">
+              <div className="brand-pill mb-5 flex h-12 w-12 items-center justify-center rounded-2xl text-lg font-bold">
                 {String(index + 1).padStart(2, "0")}
               </div>
               <h3 className="font-['Space_Grotesk',sans-serif] text-xl font-bold text-white">
@@ -363,7 +358,7 @@ export function HomePage() {
           <h2 className="mt-4 font-['Space_Grotesk',sans-serif] text-4xl font-extrabold tracking-[-0.04em] text-white sm:text-5xl">
             Cards that make
             <br />
-            <span className="text-cyan-300">a statement</span>
+            <span className="brand-gradient-text">a statement</span>
           </h2>
           <p className="mt-5 text-lg leading-8 text-white/55">
             Premium materials and sharp finishes designed to make people ask where you got it.
@@ -403,7 +398,7 @@ export function HomePage() {
           <h2 className="mt-4 font-['Space_Grotesk',sans-serif] text-4xl font-extrabold tracking-[-0.04em] text-white sm:text-5xl">
             Simple. No
             <br />
-            <span className="text-cyan-300">surprises.</span>
+            <span className="brand-gradient-text">surprises.</span>
           </h2>
           <p className="mt-5 text-lg leading-8 text-white/55">
             One card. Unlimited taps. A better first impression every time.
@@ -422,7 +417,7 @@ export function HomePage() {
               ].join(" ")}
             >
               {item.featured ? (
-                <div className="mb-4 inline-flex rounded-full bg-cyan-300 px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.2em] text-black">
+                <div className="brand-primary-btn mb-4 inline-flex rounded-full px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.2em]">
                   Most Popular
                 </div>
               ) : null}
@@ -446,7 +441,7 @@ export function HomePage() {
                 className={[
                   "mt-8 block rounded-2xl px-5 py-3 text-center text-sm font-bold transition",
                   item.featured
-                    ? "bg-cyan-300 text-black hover:bg-white"
+                    ? "brand-primary-btn"
                     : "border border-white/10 bg-white/4 text-white hover:bg-white/8",
                 ].join(" ")}
               >
@@ -463,7 +458,7 @@ export function HomePage() {
           <h2 className="mt-4 font-['Space_Grotesk',sans-serif] text-4xl font-extrabold tracking-[-0.04em] text-white sm:text-5xl">
             Questions,
             <br />
-            <span className="text-cyan-300">answered</span>
+            <span className="brand-gradient-text">answered</span>
           </h2>
         </div>
 
@@ -490,7 +485,7 @@ export function HomePage() {
           <h2 className="mt-4 font-['Space_Grotesk',sans-serif] text-4xl font-extrabold leading-tight tracking-[-0.05em] text-white sm:text-6xl">
             Your last business card.
             <br />
-            <span className="text-cyan-300">Ever.</span>
+            <span className="brand-gradient-text">Ever.</span>
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-white/55">
             Join founders, executives, and teams who upgraded from paper to a smarter first impression.
@@ -500,13 +495,13 @@ export function HomePage() {
               href="https://wa.me/8801886105253?text=Hi%2C%20I%20am%20interested%20in%20the%201card"
               target="_blank"
               rel="noreferrer"
-              className="rounded-2xl bg-cyan-300 px-6 py-3.5 text-base font-bold text-black transition hover:bg-white"
+              className="brand-primary-btn rounded-2xl px-6 py-3.5 text-base font-bold transition"
             >
               Order Your 1card
             </a>
             <a
               href="#how"
-              className="rounded-2xl border border-white/10 bg-white/5 px-6 py-3.5 text-base font-semibold text-white transition hover:bg-white/8"
+              className="brand-outline-btn rounded-2xl px-6 py-3.5 text-base font-semibold text-white transition"
             >
               See How It Works
             </a>
@@ -535,7 +530,7 @@ export function HomePage() {
           </div>
           <div>
             Designed and developed by{" "}
-            <a href="https://3jtec.com" target="_blank" rel="noreferrer" className="text-cyan-300">
+            <a href="https://3jtec.com" target="_blank" rel="noreferrer" className="brand-gradient-text">
               3J Technologies
             </a>
           </div>

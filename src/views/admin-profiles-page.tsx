@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { StatusCard } from "@/components/status-card";
 import { useAdminSession } from "@/hooks/use-admin-session";
@@ -91,22 +91,20 @@ export function AdminProfilesPage() {
     <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 py-10">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <div className="text-sm uppercase tracking-[0.22em] text-cyan-300/75">
-            Admin
-          </div>
-          <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-white">
+          <div className="admin-section-kicker">Admin</div>
+          <h1 className="mt-3 text-[2.35rem] font-semibold tracking-[-0.04em] text-white">
             Profiles
           </h1>
-          <p className="mt-2 text-sm text-white/55">
-            Search and manage published business card profiles in Supabase.
+          <p className="mt-2 text-sm text-white/48">
+            Search, review, and manage your live business card directory.
           </p>
         </div>
         <div className="flex gap-3">
           <Link
             to="/admin/profiles/new"
-            className="rounded-2xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700"
+            className="brand-primary-btn rounded-2xl px-5 py-3 font-semibold transition"
           >
-            New profile
+            New Profile
           </Link>
           <button
             type="button"
@@ -123,10 +121,10 @@ export function AdminProfilesPage() {
           type="search"
           value={query}
           onChange={(event) => handleSearchChange(event.target.value)}
-          placeholder="Search name, phone, company, email, slug..."
-          className="w-full rounded-2xl border border-white/12 bg-slate-950/40 px-4 py-3 text-white outline-none transition placeholder:text-white/35 focus:border-blue-400/60"
+          placeholder="Search name, company, phone, email, or slug..."
+          className="w-full rounded-2xl border border-white/12 bg-slate-950/40 px-4 py-3 text-white outline-none transition placeholder:text-white/28 focus:border-cyan-300/45"
         />
-        <div className="rounded-2xl border border-white/10 bg-white/6 px-4 py-3 text-sm text-white/70">
+        <div className="brand-pill rounded-2xl px-4 py-3 text-sm">
           {filteredCountLabel}
         </div>
       </div>
@@ -137,30 +135,29 @@ export function AdminProfilesPage() {
         </div>
       ) : null}
 
-      <div className="mt-6 overflow-hidden rounded-[28px] border border-white/10 bg-white/6 shadow-[0_30px_90px_rgba(0,0,0,0.36)] backdrop-blur-2xl">
+      <div className="brand-panel mt-6 overflow-hidden rounded-[28px]">
         <div className="overflow-x-auto">
           <table className="min-w-full">
-            <thead className="bg-white/6 text-left text-xs uppercase tracking-[0.18em] text-white/45">
+            <thead className="bg-white/6 text-left text-[11px] uppercase tracking-[0.18em] text-white/42">
               <tr>
-                <th className="px-5 py-4">#</th>
-                <th className="px-5 py-4">Name</th>
-                <th className="px-5 py-4">Slug</th>
-                <th className="px-5 py-4">Company</th>
-                <th className="px-5 py-4">Active</th>
-                <th className="px-5 py-4">Published</th>
-                <th className="px-5 py-4">Actions</th>
+                <th className="px-4 py-3.5">#</th>
+                <th className="px-4 py-3.5">Profile</th>
+                <th className="px-4 py-3.5">Company</th>
+                <th className="px-4 py-3.5">Status</th>
+                <th className="px-4 py-3.5">Updated</th>
+                <th className="px-4 py-3.5">Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading || sessionLoading ? (
                 <tr>
-                  <td className="px-5 py-6 text-white/60" colSpan={7}>
+                  <td className="px-4 py-6 text-white/60" colSpan={6}>
                     Loading profiles...
                   </td>
                 </tr>
               ) : profiles.length === 0 ? (
                 <tr>
-                  <td className="px-5 py-6 text-white/60" colSpan={7}>
+                  <td className="px-4 py-6 text-white/60" colSpan={6}>
                     {query.trim()
                       ? `No profiles match "${query}".`
                       : "No profiles yet. Create your first profile."}
@@ -168,22 +165,45 @@ export function AdminProfilesPage() {
                 </tr>
               ) : (
                 profiles.map((profile, index) => (
-                  <tr key={profile.id} className="border-t border-white/8 text-sm text-white/80">
-                    <td className="px-5 py-4 text-white/50">
+                  <tr
+                    key={profile.id}
+                    className="border-t border-white/8 text-sm text-white/80"
+                  >
+                    <td className="px-4 py-3.5 text-white/42">
                       {(page - 1) * PAGE_SIZE + index + 1}
                     </td>
-                    <td className="px-5 py-4 font-semibold text-white">{profile.full_name}</td>
-                    <td className="px-5 py-4 text-white/60">/u/{profile.slug}</td>
-                    <td className="px-5 py-4 whitespace-normal break-words">
-                      {profile.company ?? "�"}
+                    <td className="px-4 py-3.5">
+                      <div className="font-semibold text-white">
+                        {profile.full_name}
+                      </div>
+                      <div className="mt-1 text-xs text-white/42">
+                        /u/{profile.slug}
+                      </div>
                     </td>
-                    <td className="px-5 py-4">{profile.is_active ? "Yes" : "No"}</td>
-                    <td className="px-5 py-4">{profile.is_published ? "Yes" : "No"}</td>
-                    <td className="px-5 py-4">
-                      <div className="flex gap-3">
+                    <td className="px-4 py-3.5">
+                      <div className="whitespace-normal break-words font-medium text-white/82">
+                        {profile.company ?? "—"}
+                      </div>
+                      <div className="mt-1 text-xs text-white/40">
+                        {profile.title ?? "No title"}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3.5">
+                      <StatusChip
+                        status={getProfileStatus(
+                          profile.is_active,
+                          profile.is_published
+                        )}
+                      />
+                    </td>
+                    <td className="px-4 py-3.5 text-white/52">
+                      {formatTableDate(profile.updated_at)}
+                    </td>
+                    <td className="px-4 py-3.5">
+                      <div className="flex gap-3 text-sm">
                         <Link
                           to={`/admin/profiles/${profile.id}`}
-                          className="text-blue-300 underline underline-offset-4"
+                          className="text-cyan-200 underline underline-offset-4"
                         >
                           Edit
                         </Link>
@@ -205,7 +225,7 @@ export function AdminProfilesPage() {
         </div>
       </div>
 
-      <div className="mt-4 flex flex-col gap-3 text-sm text-white/60 md:flex-row md:items-center md:justify-between">
+      <div className="mt-4 flex flex-col gap-3 text-sm text-white/58 md:flex-row md:items-center md:justify-between">
         <div>
           Showing {pageStart}-{pageEnd} of {totalCount}
         </div>
@@ -233,4 +253,39 @@ export function AdminProfilesPage() {
       </div>
     </div>
   );
+}
+
+function getProfileStatus(isActive: boolean, isPublished: boolean) {
+  if (!isActive) return "Hidden" as const;
+  if (!isPublished) return "Draft" as const;
+  return "Active" as const;
+}
+
+function StatusChip({ status }: { status: "Active" | "Draft" | "Hidden" }) {
+  const toneClass =
+    status === "Active"
+      ? "border-emerald-400/20 bg-emerald-400/12 text-emerald-200"
+      : status === "Draft"
+        ? "border-amber-300/20 bg-amber-300/10 text-amber-100"
+        : "border-white/12 bg-white/8 text-white/68";
+
+  return (
+    <span
+      className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${toneClass}`}
+    >
+      {status}
+    </span>
+  );
+}
+
+function formatTableDate(value: string) {
+  try {
+    return new Date(value).toLocaleDateString([], {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  } catch {
+    return value;
+  }
 }
