@@ -38,6 +38,11 @@ This app includes `public/_redirects`:
 
 That keeps React Router paths such as `/u/juzer-zulfikar-ali` and `/admin/login` working after direct refreshes.
 
+The Pages Function at `functions/u/[slug].ts` looks up active, published
+profiles and injects profile-specific title, description, Open Graph, Twitter,
+and canonical tags into the SPA HTML. This makes pasted profile links show the
+person's details instead of the generic 1card.fyi site description.
+
 ## Notes
 
 - For vCard downloads, either:

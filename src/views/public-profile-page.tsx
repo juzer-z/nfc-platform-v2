@@ -142,6 +142,25 @@ export function PublicProfilePage() {
     return () => controller.abort();
   }, [profile, state]);
 
+  useEffect(() => {
+    if (state !== "ready" || !profile) return;
+
+    const role = [profile.title, profile.company].filter(Boolean).join(" at ");
+    const title = `${profile.fullName}${role ? ` — ${role}` : ""} | 1card.fyi`;
+    const description = `View ${profile.fullName}'s digital business card${
+      role ? ` — ${role}` : ""
+    }.`;
+
+    document.title = title;
+    setMetaContent("description", description);
+    setMetaContent("og:title", title, "property");
+    setMetaContent("og:description", description, "property");
+
+    return () => {
+      document.title = "1card.fyi";
+    };
+  }, [profile, state]);
+
   return (
     <div className="relative min-h-screen overflow-hidden px-4 py-10 text-white">
       <div className="absolute inset-0 bg-[#050A14]" />
@@ -166,4 +185,22 @@ export function PublicProfilePage() {
       </div>
     </div>
   );
+}
+
+function setMetaContent(
+  key: string,
+  content: string,
+  attribute: "name" | "property" = "name"
+) {
+  let element = document.head.querySelector<HTMLMetaElement>(
+    `meta[${attribute}="${key}"]`
+  );
+
+  if (!element) {
+    element = document.createElement("meta");
+    element.setAttribute(attribute, key);
+    document.head.appendChild(element);
+  }
+
+  element.content = content;
 }
