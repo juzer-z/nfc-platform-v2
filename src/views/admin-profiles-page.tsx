@@ -4,14 +4,14 @@ import { StatusCard } from "@/components/status-card";
 import { useAdminSession } from "@/hooks/use-admin-session";
 import { listProfiles } from "@/lib/supabase-profiles";
 import { supabase } from "@/lib/supabase";
-import type { ProfileRecord } from "@/lib/types";
+import type { ProfileRecordWithViewCount } from "@/lib/types";
 
 const PAGE_SIZE = 50;
 
 export function AdminProfilesPage() {
   const navigate = useNavigate();
   const { configured, loading: sessionLoading, session } = useAdminSession();
-  const [profiles, setProfiles] = useState<ProfileRecord[]>([]);
+  const [profiles, setProfiles] = useState<ProfileRecordWithViewCount[]>([]);
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
@@ -144,6 +144,7 @@ export function AdminProfilesPage() {
                 <th className="px-4 py-3.5">Profile</th>
                 <th className="px-4 py-3.5">Company</th>
                 <th className="px-4 py-3.5">Status</th>
+                <th className="px-4 py-3.5 text-right">Views</th>
                 <th className="px-4 py-3.5">Updated</th>
                 <th className="px-4 py-3.5">Actions</th>
               </tr>
@@ -151,13 +152,13 @@ export function AdminProfilesPage() {
             <tbody>
               {loading || sessionLoading ? (
                 <tr>
-                  <td className="px-4 py-6 text-white/60" colSpan={6}>
+                  <td className="px-4 py-6 text-white/60" colSpan={7}>
                     Loading profiles...
                   </td>
                 </tr>
               ) : profiles.length === 0 ? (
                 <tr>
-                  <td className="px-4 py-6 text-white/60" colSpan={6}>
+                  <td className="px-4 py-6 text-white/60" colSpan={7}>
                     {query.trim()
                       ? `No profiles match "${query}".`
                       : "No profiles yet. Create your first profile."}
@@ -195,6 +196,9 @@ export function AdminProfilesPage() {
                           profile.is_published
                         )}
                       />
+                    </td>
+                    <td className="px-4 py-3.5 text-right font-semibold tabular-nums text-cyan-100/80">
+                      {profile.view_count.toLocaleString()}
                     </td>
                     <td className="px-4 py-3.5 text-white/52">
                       {formatTableDate(profile.updated_at)}

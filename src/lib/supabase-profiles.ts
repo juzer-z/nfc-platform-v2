@@ -1,6 +1,10 @@
 import { buildProfilePayload, type ProfileFormValues } from "./profile-form";
 import { supabase } from "./supabase";
-import type { ProfileRecord } from "./types";
+import type { ProfileRecord, ProfileRecordWithViewCount } from "./types";
+
+type ProfileWithViewAggregate = ProfileRecord & {
+  profile_views: Array<{ count: number }>;
+};
 
 export type ProfileDuplicateCandidate = Pick<
   ProfileRecord,
@@ -21,7 +25,7 @@ export async function listProfiles({
 
   let request = supabase
     .from("profiles")
-    .select("*", { count: "exact" })
+    .select("*, profile_views(count)", { count: "exact" })
     .order("created_at", { ascending: false });
 
   const trimmed = query.trim();
@@ -43,7 +47,15 @@ export async function listProfiles({
     );
   }
 
-  return request.range(from, to);
+  const result = await request.range(from, to);
+  const data = (result.data as ProfileWithViewAggregate[] | null)?.map(
+    ({ profile_views, ...profile }) => ({
+      ...profile,
+      view_count: profile_views?.[0]?.count ?? 0,
+    })
+  ) satisfies ProfileRecordWithViewCount[] | undefined;
+
+  return { ...result, data: data ?? null };
 }
 
 export async function getProfileById(id: string) {

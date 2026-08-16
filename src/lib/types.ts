@@ -47,6 +47,10 @@ export type ProfileRecord = {
   updated_at: string;
 };
 
+export type ProfileRecordWithViewCount = ProfileRecord & {
+  view_count: number;
+};
+
 export type Database = {
   public: {
     Tables: {
