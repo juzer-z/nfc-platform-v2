@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { PublicProfileCard } from "@/components/public-profile-card";
 import { PublicProfileCardSkeleton } from "@/components/public-profile-card-skeleton";
@@ -35,6 +35,7 @@ const demoProfile: PublicProfile = {
 
 export function PublicProfilePage() {
   const { slug = "" } = useParams();
+  const trackedProfileIdRef = useRef<string | null>(null);
   const [profile, setProfile] = useState<PublicProfile | null>(() => {
     if (typeof window === "undefined" || !slug) return null;
 
@@ -127,19 +128,17 @@ export function PublicProfilePage() {
 
   useEffect(() => {
     if (state !== "ready" || !profile || !hasSupabaseConfig()) return;
-
-    const controller = new AbortController();
+    if (trackedProfileIdRef.current === profile.id) return;
+    trackedProfileIdRef.current = profile.id;
 
     fetch("/api/profile-view", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ profileId: profile.id }),
-      signal: controller.signal,
+      keepalive: true,
     }).catch(() => {
       // View tracking is best-effort only.
     });
-
-    return () => controller.abort();
   }, [profile, state]);
 
   useEffect(() => {

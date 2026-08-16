@@ -15,6 +15,7 @@ export function AdminProfilesPage() {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [refreshVersion, setRefreshVersion] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -55,7 +56,26 @@ export function AdminProfilesPage() {
       ignore = true;
       window.clearTimeout(timer);
     };
-  }, [configured, page, query, session]);
+  }, [configured, page, query, refreshVersion, session]);
+
+  useEffect(() => {
+    if (!configured || !session) return;
+
+    const refresh = () => setRefreshVersion((version) => version + 1);
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === "visible") refresh();
+    };
+    const interval = window.setInterval(refresh, 10_000);
+
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+    };
+  }, [configured, session]);
 
   const filteredCountLabel = useMemo(() => {
     if (!query.trim()) return `${totalCount} total`;
