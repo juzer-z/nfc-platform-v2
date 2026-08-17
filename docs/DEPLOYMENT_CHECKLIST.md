@@ -175,10 +175,12 @@ using (public.is_active_admin())
 with check (public.is_active_admin());
 
 drop policy if exists "admins can read profile views" on public.profile_views;
-create policy "admins can read profile views"
+drop policy if exists "profile managers can read profile views" on public.profile_views;
+create policy "profile managers can read profile views"
 on public.profile_views
 for select
-using (public.is_active_admin());
+to authenticated
+using (public.can_manage_profiles());
 
 drop policy if exists "public can insert profile views" on public.profile_views;
 create policy "public can insert profile views"

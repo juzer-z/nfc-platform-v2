@@ -58,25 +58,6 @@ export function AdminProfilesPage() {
     };
   }, [configured, page, query, refreshVersion, session]);
 
-  useEffect(() => {
-    if (!configured || !session) return;
-
-    const refresh = () => setRefreshVersion((version) => version + 1);
-    const refreshWhenVisible = () => {
-      if (document.visibilityState === "visible") refresh();
-    };
-    const interval = window.setInterval(refresh, 10_000);
-
-    window.addEventListener("focus", refresh);
-    document.addEventListener("visibilitychange", refreshWhenVisible);
-
-    return () => {
-      window.clearInterval(interval);
-      window.removeEventListener("focus", refresh);
-      document.removeEventListener("visibilitychange", refreshWhenVisible);
-    };
-  }, [configured, session]);
-
   const filteredCountLabel = useMemo(() => {
     if (!query.trim()) return `${totalCount} total`;
     return `${totalCount} match${totalCount === 1 ? "" : "es"}`;
@@ -144,8 +125,18 @@ export function AdminProfilesPage() {
           placeholder="Search name, company, phone, email, or slug..."
           className="w-full rounded-2xl border border-white/12 bg-slate-950/40 px-4 py-3 text-white outline-none transition placeholder:text-white/28 focus:border-cyan-300/45"
         />
-        <div className="brand-pill rounded-2xl px-4 py-3 text-sm">
-          {filteredCountLabel}
+        <div className="flex gap-3">
+          <div className="brand-pill rounded-2xl px-4 py-3 text-sm">
+            {filteredCountLabel}
+          </div>
+          <button
+            type="button"
+            onClick={() => setRefreshVersion((version) => version + 1)}
+            disabled={loading}
+            className="rounded-2xl border border-white/12 bg-white/8 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/12 disabled:cursor-wait disabled:opacity-50"
+          >
+            {loading ? "Refreshing..." : "Refresh views"}
+          </button>
         </div>
       </div>
 

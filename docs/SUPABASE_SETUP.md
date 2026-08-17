@@ -73,6 +73,11 @@ create table if not exists public.user_roles (
 - `EMPLOYEE` can create/edit profiles but cannot delete them
 - Only admins can read profile views
 
+If all view totals appear as zero for a signed-in profile manager, run
+`PROFILE_VIEW_COUNT_FIX.sql` in the production Supabase SQL Editor. The view
+rows are protected by RLS, so the admin account must satisfy
+`public.can_manage_profiles()` before aggregate counts are visible.
+
 Example public read policy:
 
 ```sql
