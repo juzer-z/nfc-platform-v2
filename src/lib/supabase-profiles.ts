@@ -15,47 +15,93 @@ export async function listProfiles({
   query,
   page,
   pageSize,
+  sortByViews,
 }: {
   query: string;
   page: number;
   pageSize: number;
+  sortByViews?: "asc" | "desc" | null;
 }) {
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
-
-  let request = supabase
-    .from("profiles")
-    .select("*, profile_views(count)", { count: "exact" })
-    .order("created_at", { ascending: false });
-
   const trimmed = query.trim();
-  if (trimmed) {
-    request = request.or(
-      [
-        `full_name.ilike.%${trimmed}%`,
-        `slug.ilike.%${trimmed}%`,
-        `title.ilike.%${trimmed}%`,
-        `company.ilike.%${trimmed}%`,
-        `department.ilike.%${trimmed}%`,
-        `phone.ilike.%${trimmed}%`,
-        `whatsapp.ilike.%${trimmed}%`,
-        `email_public.ilike.%${trimmed}%`,
-        `website.ilike.%${trimmed}%`,
-        `linkedin.ilike.%${trimmed}%`,
-        `address.ilike.%${trimmed}%`,
-      ].join(",")
-    );
+
+  function createRequest() {
+    let request = supabase
+      .from("profiles")
+      .select("*, profile_views(count)", { count: "exact" })
+      .order("created_at", { ascending: false });
+
+    if (trimmed) {
+      request = request.or(
+        [
+          `full_name.ilike.%${trimmed}%`,
+          `slug.ilike.%${trimmed}%`,
+          `title.ilike.%${trimmed}%`,
+          `company.ilike.%${trimmed}%`,
+          `department.ilike.%${trimmed}%`,
+          `phone.ilike.%${trimmed}%`,
+          `whatsapp.ilike.%${trimmed}%`,
+          `email_public.ilike.%${trimmed}%`,
+          `website.ilike.%${trimmed}%`,
+          `linkedin.ilike.%${trimmed}%`,
+          `address.ilike.%${trimmed}%`,
+        ].join(",")
+      );
+    }
+
+    return request;
   }
 
-  const result = await request.range(from, to);
-  const data = (result.data as ProfileWithViewAggregate[] | null)?.map(
+  if (!sortByViews) {
+    const result = await createRequest().range(from, to);
+    return { ...result, data: mapViewCounts(result.data) };
+  }
+
+  const batchSize = 1_000;
+  const allProfiles: ProfileRecordWithViewCount[] = [];
+  let totalCount = 0;
+
+  for (let batchStart = 0; ; batchStart += batchSize) {
+    const result = await createRequest().range(
+      batchStart,
+      batchStart + batchSize - 1
+    );
+
+    if (result.error) {
+      return { data: null, error: result.error, count: result.count };
+    }
+
+    const batch = mapViewCounts(result.data) ?? [];
+    allProfiles.push(...batch);
+    totalCount = result.count ?? allProfiles.length;
+
+    if (allProfiles.length >= totalCount || batch.length < batchSize) break;
+  }
+
+  allProfiles.sort((left, right) => {
+    const difference = left.view_count - right.view_count;
+    if (difference !== 0) {
+      return sortByViews === "asc" ? difference : -difference;
+    }
+
+    return right.created_at.localeCompare(left.created_at);
+  });
+
+  return {
+    data: allProfiles.slice(from, to + 1),
+    error: null,
+    count: totalCount,
+  };
+}
+
+function mapViewCounts(data: unknown[] | null) {
+  return (data as ProfileWithViewAggregate[] | null)?.map(
     ({ profile_views, ...profile }) => ({
       ...profile,
       view_count: profile_views?.[0]?.count ?? 0,
     })
   ) satisfies ProfileRecordWithViewCount[] | undefined;
-
-  return { ...result, data: data ?? null };
 }
 
 export async function getProfileById(id: string) {

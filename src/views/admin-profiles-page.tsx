@@ -14,6 +14,7 @@ export function AdminProfilesPage() {
   const [profiles, setProfiles] = useState<ProfileRecordWithViewCount[]>([]);
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
+  const [viewSort, setViewSort] = useState<"asc" | "desc" | null>(null);
   const [totalCount, setTotalCount] = useState(0);
   const [refreshVersion, setRefreshVersion] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -41,6 +42,7 @@ export function AdminProfilesPage() {
         query,
         page,
         pageSize: PAGE_SIZE,
+        sortByViews: viewSort,
       });
       if (ignore) return;
       if (requestError) {
@@ -56,7 +58,7 @@ export function AdminProfilesPage() {
       ignore = true;
       window.clearTimeout(timer);
     };
-  }, [configured, page, query, refreshVersion, session]);
+  }, [configured, page, query, refreshVersion, session, viewSort]);
 
   const filteredCountLabel = useMemo(() => {
     if (!query.trim()) return `${totalCount} total`;
@@ -74,6 +76,11 @@ export function AdminProfilesPage() {
 
   function handleSearchChange(value: string) {
     setQuery(value);
+    setPage(1);
+  }
+
+  function toggleViewSort() {
+    setViewSort((current) => (current === "desc" ? "asc" : "desc"));
     setPage(1);
   }
 
@@ -155,7 +162,36 @@ export function AdminProfilesPage() {
                 <th className="px-4 py-3.5">Profile</th>
                 <th className="px-4 py-3.5">Company</th>
                 <th className="px-4 py-3.5">Status</th>
-                <th className="px-4 py-3.5 text-right">Views</th>
+                <th
+                  className="px-4 py-3.5 text-right"
+                  aria-sort={
+                    viewSort === "desc"
+                      ? "descending"
+                      : viewSort === "asc"
+                        ? "ascending"
+                        : "none"
+                  }
+                >
+                  <button
+                    type="button"
+                    onClick={toggleViewSort}
+                    className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 transition hover:bg-white/8 hover:text-white/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50"
+                    title={
+                      viewSort === "desc"
+                        ? "Sort by lowest views"
+                        : "Sort by highest views"
+                    }
+                  >
+                    Views
+                    <span aria-hidden="true" className="text-cyan-200/80">
+                      {viewSort === "desc"
+                        ? "↓"
+                        : viewSort === "asc"
+                          ? "↑"
+                          : "↕"}
+                    </span>
+                  </button>
+                </th>
                 <th className="px-4 py-3.5">Updated</th>
                 <th className="px-4 py-3.5">Actions</th>
               </tr>
